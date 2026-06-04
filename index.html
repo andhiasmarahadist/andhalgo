@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANDHALGO - Belajar Logika Jadi Petualangan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS for Excel exports/imports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#4F46E5', 
+                        secondary: '#F59E0B', 
+                        dark: '#1E293B', 
+                        success: '#10B981', 
+                        danger: '#EF4444' 
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #F8FAFC; overflow-x: hidden; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .logo-block { background: linear-gradient(135deg, #4F46E5, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .grid-cell { transition: all 0.2s; }
+        .grid-cell.active { transform: scale(0.95); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+        .robot { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .cmd-block { cursor: grab; transition: transform 0.1s; }
+        .cmd-block:active { cursor: grabbing; transform: scale(0.98); }
+        .cmd-block.dragging { opacity: 0.5; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .cmd-block.running { border: 2px solid #F59E0B; box-shadow: 0 0 12px #F59E0B; transform: scale(1.02); }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    </style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-90 z-[9999] hidden flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-indigo-200 border-t-primary rounded-full animate-spin mb-4"></div>
+        <p id="loading-text" class="text-lg font-semibold text-dark">Memproses...</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2"></div>
+
+    <!-- Main Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 py-3 px-6 flex justify-between items-center z-50 shrink-0">
+        <div class="flex items-center gap-3">
+            <img src="https://i.imghippo.com/files/vZv7852lw.png" class="h-10 w-auto object-contain" alt="ANDHALGO Logo Small">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight logo-block">ANDHALGO</h1>
+                <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Belajar Logika Jadi Petualangan</p>
+            </div>
+        </div>
+        <div id="user-menu" class="hidden flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p id="user-name" class="font-bold text-sm text-dark"></p>
+                <p id="user-role-badge" class="text-xs text-primary bg-indigo-50 inline-block px-2 py-0.5 rounded"></p>
+            </div>
+            <button onclick="Auth.logout()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600 transition flex justify-center items-center">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </header>
+
+    <main id="main-view-container" class="flex-grow flex flex-col overflow-y-auto relative">
+        
+        <!-- View: Login -->
+        <div id="view-login" class="flex-grow flex flex-col items-center justify-center bg-gray-50 p-4 w-full">
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md fade-in text-center border border-gray-100 mt-8 mb-4">
+                <!-- Large Logo Request -->
+                <img src="https://i.imghippo.com/files/vZv7852lw.png" class="mx-auto h-32 w-auto object-contain mb-4" alt="ANDHALGO Logo Large">
+                <h2 class="text-2xl font-bold text-dark mb-1">Selamat Datang</h2>
+                <p class="text-sm text-gray-500 mb-6">Masuk untuk memulai petualangan logikamu!</p>
+                
+                <form id="login-form" onsubmit="Auth.login(event)" class="space-y-4">
+                    <div class="text-left">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Username / NISN</label>
+                        <input type="text" id="login-user" class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-sm" placeholder="Masukkan username" required>
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-pass" class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-sm" placeholder="Masukkan password" required>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-md hover:bg-indigo-600 hover:shadow-lg transition transform hover:-translate-y-0.5 text-sm">
+                        <i class="fas fa-paper-plane mr-2"></i> Mulai Bermain
+                    </button>
+                </form>
+
+                <div class="mt-6 border-t pt-4 text-center">
+                    <p class="text-xs text-gray-500">Belum memiliki akun?</p>
+                    <button onclick="Auth.showRegisterView()" class="mt-2 text-primary hover:underline text-sm font-bold flex items-center justify-center gap-1 mx-auto">
+                        <i class="fas fa-user-plus"></i> Daftar Akun Baru Sekarang
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-400 font-semibold mb-6">Trademark: Andhi Asmara Hadi &copy; 2026</p>
+        </div>
+
+        <!-- View: Register -->
+        <div id="view-register" class="hidden flex-grow flex flex-col items-center justify-center bg-gray-50 p-4 w-full">
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md fade-in text-center border border-gray-100 mt-8 mb-4">
+                <img src="https://i.imghippo.com/files/vZv7852lw.png" class="mx-auto h-24 w-auto object-contain mb-2" alt="ANDHALGO Register Logo">
+                <h2 class="text-2xl font-bold text-dark mb-1">Daftar Akun Baru</h2>
+                <p class="text-sm text-gray-500 mb-6">Isi formulir pendaftaran siswa dengan lengkap</p>
+                
+                <form id="register-form" onsubmit="Auth.register(event)" class="space-y-4">
+                    <div class="text-left">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Username / NISN</label>
+                        <input type="text" id="reg-username" class="w-full border border-gray-300 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-xs" placeholder="Masukkan NISN atau Angka Unik" required>
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Password</label>
+                        <input type="password" id="reg-password" class="w-full border border-gray-300 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-xs" placeholder="Atur kata sandi baru" required>
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="reg-nama" class="w-full border border-gray-300 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-xs" placeholder="Nama lengkap siswa" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="text-left">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Kelas</label>
+                            <input type="text" id="reg-kelas" class="w-full border border-gray-300 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-xs" placeholder="Contoh: 7A" required>
+                        </div>
+                        <div class="text-left">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tahun Pelajaran</label>
+                            <input type="text" id="reg-tahun" class="w-full border border-gray-300 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-xs" placeholder="Contoh: 2025/2026" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-success text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-600 transition text-sm">
+                        <i class="fas fa-check-circle mr-2"></i> Selesaikan Pendaftaran
+                    </button>
+                </form>
+
+                <div class="mt-6 border-t pt-4 text-center">
+                    <button onclick="Auth.showLoginView()" class="text-gray-500 hover:text-dark text-xs font-bold flex items-center justify-center gap-1 mx-auto">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Form Login
+                    </button>
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 font-semibold mb-6">Trademark: Andhi Asmara Hadi &copy; 2026</p>
+        </div>
+
+        <!-- View: Peserta (Map & Game) -->
+        <div id="view-peserta" class="hidden flex-grow flex-col bg-gray-50">
+            <!-- Peta Level -->
+            <div id="peserta-map" class="flex-grow p-4 md:p-8 overflow-y-auto fade-in">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-dark mb-1">Peta Petualangan</h2>
+                            <p class="text-gray-500 text-sm">Selesaikan level untuk membuka area baru!</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Skor</p>
+                            <p id="student-score-display" class="text-3xl font-extrabold text-secondary">0</p>
+                        </div>
+                    </div>
+                    <div id="level-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Levels rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Permainan -->
+            <div id="peserta-game" class="hidden flex-grow flex flex-col fade-in relative h-full">
+                <div class="bg-white border-b px-4 py-3 flex justify-between items-center shadow-sm z-10 shrink-0">
+                    <button onclick="UI.showStudentMap()" class="text-gray-600 hover:text-primary font-bold"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
+                    <h3 id="game-title" class="font-bold text-dark text-lg hidden sm:block">Level 1</h3>
+                    <div class="flex gap-2">
+                        <button onclick="Game.useHelp()" class="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-purple-200 transition"><i class="fas fa-lightbulb"></i> Bantuan (<span id="help-count">2</span>)</button>
+                        <button onclick="Game.resetCommands()" class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-red-200 transition"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>
+                </div>
+                
+                <div id="game-container" class="flex-grow flex flex-col md:flex-row overflow-hidden">
+                    <!-- Area Animasi Program (Sisi Kiri/Atas) -->
+                    <div class="w-full md:w-1/2 bg-gray-100 p-4 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-300 overflow-y-auto">
+                        <div class="bg-white p-4 rounded-xl shadow-sm mb-4 w-full max-w-sm">
+                            <p id="game-instruction" class="text-sm text-gray-700 font-medium text-center"></p>
+                        </div>
+                        <div id="canvas-grid" class="relative bg-white shadow-lg rounded-lg border-4 border-gray-800 overflow-hidden" style="width:300px; height:300px;">
+                            <!-- Grid rendering... -->
+                        </div>
+                    </div>
+
+                    <!-- Area Blok Program (Sisi Kanan/Bawah) -->
+                    <div class="w-full md:w-1/2 flex flex-col bg-white overflow-hidden">
+                        <div class="p-3 bg-gray-50 border-b border-gray-200 flex flex-wrap gap-2 shrink-0" id="block-palette"></div>
+                        
+                        <div class="flex-grow p-4 overflow-y-auto relative bg-slate-50" id="block-workarea">
+                            <p class="text-xs text-gray-400 font-bold mb-3 uppercase tracking-wider text-center">Area Skrip <span id="block-limit-text" class="text-secondary">(Maks 0)</span></p>
+                            <div id="commands-list" class="flex flex-col gap-2 min-h-[200px]" ondragover="StudentUI.allowDrop(event)" ondrop="StudentUI.drop(event)"></div>
+                        </div>
+
+                        <div class="p-4 bg-white border-t border-gray-200 shrink-0">
+                            <button onclick="Game.run()" class="w-full bg-success text-white py-3 rounded-xl font-bold shadow-md hover:bg-green-600 hover:shadow-lg transition text-lg flex justify-center items-center gap-2">
+                                <i class="fas fa-play"></i> Jalankan Program
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Admin Dashboard -->
+        <div id="view-admin" class="hidden flex-grow bg-gray-50 overflow-y-auto p-4 md:p-8 fade-in">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-dark">Dashboard Guru</h2>
+                        <p class="text-gray-500 text-sm">Pantau progres logika siswa, cari, kelola, dan hapus akun.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="Admin.showAddStudentModal()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-gray-50"><i class="fas fa-user-plus text-primary mr-1"></i> Tambah Manual</button>
+                        <button onclick="Admin.showUploadModal()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-gray-50"><i class="fas fa-file-excel text-green-600 mr-1"></i> Upload Excel</button>
+                        <button onclick="Admin.showAddLevelModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-indigo-600"><i class="fas fa-magic mr-1"></i> Buat Soal AI</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl"><i class="fas fa-users"></i></div>
+                        <div><p class="text-gray-500 text-sm font-semibold">Total Siswa</p><h3 id="admin-stat-siswa" class="text-2xl font-bold text-dark">0</h3></div>
+                    </div>
+                    <div onclick="Admin.sortBy('level')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:border-primary transition">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl"><i class="fas fa-map"></i></div>
+                        <div><p class="text-gray-500 text-sm font-semibold">Max Level Dicapai <i class="fas fa-sort text-xs ml-1 text-gray-400"></i></p><h3 id="admin-stat-level" class="text-2xl font-bold text-dark">0</h3></div>
+                    </div>
+                    <div onclick="Admin.sortBy('skor')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:border-primary transition">
+                        <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-xl"><i class="fas fa-trophy"></i></div>
+                        <div><p class="text-gray-500 text-sm font-semibold">Skor Tertinggi <i class="fas fa-sort text-xs ml-1 text-gray-400"></i></p><h3 id="admin-stat-skor" class="text-2xl font-bold text-dark">0</h3></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+                    <div class="p-4 md:p-6 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-gray-50 gap-4">
+                        <h3 class="text-lg font-bold text-dark">Laporan Progres & Manajemen Data</h3>
+                        
+                        <!-- Filter & Search Section -->
+                        <div class="flex flex-wrap gap-2 items-center w-full lg:w-auto">
+                            <!-- Student Search Request -->
+                            <div class="relative w-full sm:w-48">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="fas fa-search text-xs"></i>
+                                </span>
+                                <input type="text" id="admin-search-input" oninput="Admin.applyFilter()" placeholder="Cari nama siswa..." class="border border-gray-300 pl-8 pr-3 py-2 text-xs rounded-lg w-full bg-white focus:ring-1 focus:ring-primary focus:border-primary">
+                            </div>
+                            <select id="filter-tahun" onchange="Admin.applyFilter()" class="border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white focus:ring-primary focus:border-primary"><option value="">Semua Tahun</option></select>
+                            <select id="filter-kelas" onchange="Admin.applyFilter()" class="border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white focus:ring-primary focus:border-primary"><option value="">Semua Kelas</option></select>
+                            <button onclick="Admin.printReport()" class="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition shadow-sm font-bold text-xs"><i class="fas fa-print mr-1"></i> Cetak</button>
+                            <button onclick="Admin.loadData()" class="bg-primary text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition shadow-sm font-bold text-xs"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[1000px]">
+                            <thead>
+                                <tr class="bg-white text-gray-500 border-b border-gray-200 text-sm">
+                                    <th class="p-4 font-semibold">Username (NISN)</th>
+                                    <th class="p-4 font-semibold">Nama Lengkap</th>
+                                    <th class="p-4 font-semibold text-center">Kelas</th>
+                                    <th class="p-4 font-semibold text-center">Tahun</th>
+                                    <th class="p-4 font-semibold text-center">Lvl Terbuka</th>
+                                    <th class="p-4 font-semibold text-right">Skor Total</th>
+                                    <th class="p-4 font-semibold text-center">Status Level (20)</th>
+                                    <th class="p-4 font-semibold text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-3 text-center z-10 shrink-0">
+        <!-- Trademark Request -->
+        <p class="text-xs text-gray-400 font-medium">&copy; 2026 ANDHALGO - Andhi Asmara Hadi. All rights reserved.</p>
+    </footer>
+
+    <!-- ==================== MODALS ==================== -->
+    
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[10000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
+            <img src="https://i.imghippo.com/files/vZv7852lw.png" class="mx-auto h-20 w-auto object-contain mb-4" alt="ANDHALGO Logo Welcome">
+            <h2 class="text-2xl font-extrabold text-dark mb-4">Info Aplikasi</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed text-sm">
+                Selamat Datang di Aplikasi <strong>ANDHALGO</strong>. Aplikasi ini membantu kalian dalam memahami logika dan algoritma pemrograman secara lebih menyenangkan. Di sini kalian akan diajak untuk menyelesaikan beberapa level logika visual pemrograman. Selamat Berpetualang!
+            </p>
+            <button onclick="UI.closeWelcomeModal()" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-md hover:bg-indigo-600 transition text-sm">
+                OK, Mulai Petualangan
+            </button>
+        </div>
+    </div>
+
+    <!-- Level Info Pop-up (What is Studied) Request -->
+    <div id="level-info-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[10000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
+            <div class="flex items-center gap-4 border-b pb-4 mb-4">
+                <div id="lvl-info-icon-container" class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-md">
+                    <i id="lvl-info-icon" class="fas fa-brain"></i>
+                </div>
+                <div>
+                    <span id="lvl-info-category" class="text-[10px] font-bold text-primary uppercase bg-indigo-50 px-2 py-0.5 rounded">MATERI</span>
+                    <h3 id="lvl-info-title" class="text-lg font-bold text-dark mt-0.5">Judul Level</h3>
+                </div>
+            </div>
+            <div class="mb-6 space-y-3">
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Materi Yang Dipelajari:</h4>
+                    <p id="lvl-info-desc" class="text-sm text-gray-700 font-medium bg-gray-50 p-3 rounded-xl border border-gray-100 mt-1 leading-relaxed"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                    <div class="bg-blue-50 border border-blue-100 p-2 rounded-lg">
+                        <span class="block text-gray-500 font-semibold">Batas Blok</span>
+                        <span id="lvl-info-max-blocks" class="text-sm font-bold text-blue-700">0</span>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-100 p-2 rounded-lg">
+                        <span class="block text-gray-500 font-semibold">Skrip Minimum</span>
+                        <span id="lvl-info-ideal" class="text-sm font-bold text-purple-700">0 Blok</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('level-info-modal').classList.add('hidden')" class="w-1/3 bg-gray-200 text-gray-800 font-bold py-2.5 rounded-xl hover:bg-gray-300 transition text-sm">Kembali</button>
+                <button id="lvl-info-start-btn" class="w-2/3 bg-primary text-white font-bold py-2.5 rounded-xl shadow-md hover:bg-indigo-600 transition text-sm">Mulai Selesaikan <i class="fas fa-arrow-right ml-1"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[10000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform transition-transform scale-95">
+            <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-star text-5xl text-yellow-400 drop-shadow-md"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-dark mb-2">Luar Biasa!</h2>
+            <p class="text-gray-500 mb-4">Kamu berhasil menyelesaikan logika ini.</p>
+            
+            <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-bold text-gray-600">Skor Kode:</span>
+                    <span id="level-score-earned" class="text-xl font-bold text-success">+100</span>
+                </div>
+                <div class="flex justify-between items-center mb-2 pt-2 border-t border-gray-200">
+                    <span class="text-sm font-bold text-gray-600">Total Skor:</span>
+                    <span id="level-total-score" class="text-xl font-bold text-primary">0</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                    <div id="score-bar" class="bg-success h-2.5 rounded-full" style="width: 100%"></div>
+                </div>
+                <p id="score-note" class="text-xs text-gray-500 mt-2 text-left">Sangat efisien!</p>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="Game.backToMap()" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl shadow-sm hover:bg-gray-300 transition text-sm">Kembali</button>
+                <button onclick="Game.playNextLevel()" class="w-2/3 bg-primary text-white font-bold py-3 rounded-xl shadow-md hover:bg-indigo-600 transition text-sm">Lanjut Level <i class="fas fa-arrow-right ml-1"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal (NO alert/confirm) Request -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-lg font-bold text-dark mb-2">Hapus Data Siswa</h3>
+            <p class="text-sm text-gray-500 mb-6">Apakah Anda yakin ingin menghapus data siswa <span id="delete-student-name" class="font-bold text-red-600"></span>? Semua progres permainan akan ikut terhapus.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="Admin.closeDeleteModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                <button onclick="Admin.executeDelete()" class="bg-danger text-white px-5 py-2 rounded-lg font-bold text-sm">Hapus Permanen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Config Block Modal -->
+    <div id="config-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[10000] hidden flex items-center justify-center px-4 fade-in">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 id="config-title" class="text-xl font-bold mb-4 text-dark"><i class="fas fa-cog text-primary"></i> Pengaturan Blok</h3>
+            <div id="config-n-container" class="mb-4">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Jumlah Perulangan (N):</label>
+                <input type="number" id="config-n-input" min="1" max="10" value="2" class="border p-2 rounded w-full focus:ring-2 focus:ring-primary text-lg font-bold">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Perintah di Dalamnya:</label>
+                <select id="config-action-input" class="border p-2 rounded w-full focus:ring-2 focus:ring-primary bg-gray-50 font-semibold">
+                    <option value="FWD">Maju (Forward)</option>
+                    <option value="RIGHT">Putar Kanan</option>
+                    <option value="LEFT">Putar Kiri</option>
+                    <option value="JUMP">Lompat (Jump)</option>
+                </select>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-bold">Batal</button>
+                <button onclick="StudentUI.saveConfigBlock()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Add Student Modal -->
+    <div id="add-student-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-dark border-b pb-2"><i class="fas fa-user-plus text-primary"></i> Tambah Siswa</h3>
+            <form id="form-add-student" onsubmit="Admin.submitAddStudent(event)">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Username (NISN)</label><input type="text" id="add-s-user" class="border p-2 rounded w-full text-sm" required></div>
+                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Password</label><input type="text" id="add-s-pass" value="edudigital" class="border p-2 rounded w-full text-sm" required></div>
+                </div>
+                <div class="mb-3"><label class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap</label><input type="text" id="add-s-nama" class="border p-2 rounded w-full text-sm" required></div>
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Kelas</label><input type="text" id="add-s-kelas" placeholder="7A" class="border p-2 rounded w-full text-sm" required></div>
+                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Tahun Ajaran</label><input type="text" id="add-s-tahun" placeholder="2025/2026" class="border p-2 rounded w-full text-sm" required></div>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="document.getElementById('add-student-modal').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                    <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Excel Modal -->
+    <div id="upload-student-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 class="text-xl font-bold mb-2 text-dark border-b pb-2"><i class="fas fa-file-excel text-green-600"></i> Upload Data Excel</h3>
+            <p class="text-sm text-gray-600 mb-4">Unggah banyak siswa menggunakan template .xlsx</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4 text-center">
+                <button onclick="Admin.downloadTemplate()" class="text-blue-700 font-bold text-sm hover:underline"><i class="fas fa-download"></i> Download Template Excel</button>
+            </div>
+            <div class="mb-5">
+                <input type="file" id="file-upload-excel" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700">
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button onclick="document.getElementById('upload-student-modal').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                <button onclick="Admin.handleUploadExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Level Modal -->
+    <div id="add-level-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 class="text-xl font-bold mb-2 text-dark border-b pb-2"><i class="fas fa-magic text-primary"></i> Racik Soal via AI</h3>
+            <div class="mb-5">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Materi Soal</label>
+                <select id="ai-level-cat" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-primary">
+                    <option value="Logika Maju Belok Sederhana">Logika Maju/Belok (Dasar)</option>
+                    <option value="Perulangan (Looping) Rintangan Banyak">Perulangan / Looping (Menengah)</option>
+                    <option value="Pengkondisian dan Lompat Kompleks">Lompat & Rintangan (Sulit)</option>
+                </select>
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button onclick="document.getElementById('add-level-modal').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                <button onclick="Admin.generateLevelWithAI()" class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm"><i class="fas fa-robot mr-1"></i> Buat Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================================================================
+        // KONFIGURASI APLIKASI UTAMA
+        // ===================================================================
+        // UBAH IS_PREVIEW KE false JIKA AKAN DI-DEPLOY KE BLOGGER
+        const IS_PREVIEW = true; 
+        
+        // PASTIKAN GAS_URL INI SUDAH DI-DEPLOY SEBAGAI 'ANYONE'
+        const GAS_URL = "URL_DEPLOY_GAS_ANDA_DISINI";
+        // ===================================================================
+
+        // DATA LEVEL LENGKAP 20 LEVEL DENGAN MATERI PEMBELAJARAN DETAIL
+        const LEVELS_DATA = [
+            { id: 1, title: "Langkah Pertama", icon: "fa-shoe-prints", category: "Urutan", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:3, y:0}, obstacles: [], palette: ["FWD"], max: 10, minBlocks: 3, solution: [{t:"FWD"}, {t:"FWD"}, {t:"FWD"}], desc: "Mempelajari algoritma sekuensial paling dasar. Kamu akan memahami bagaimana robot mengeksekusi instruksi langkah demi langkah dari atas ke bawah secara teratur." },
+            { id: 2, title: "Belok Kanan", icon: "fa-redo", category: "Urutan", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:2, y:2}, obstacles: [], palette: ["FWD", "RIGHT"], max: 12, minBlocks: 5, solution: [{t:"FWD"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"},{t:"FWD"}], desc: "Menggabungkan instruksi berputar arah dengan pergerakan maju. Level ini menguji kemampuan membayangkan orientasi robot (kiri/kanan) dari perspektif robot sendiri." },
+            { id: 3, title: "Menghindar", icon: "fa-exclamation-triangle", category: "Logika", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:4, y:0}, obstacles: [[2,0], [2,1]], palette: ["FWD", "RIGHT", "LEFT"], max: 18, minBlocks: 11, solution: [{t:"RIGHT"},{t:"FWD"},{t:"FWD"},{t:"LEFT"},{t:"FWD"},{t:"FWD"},{t:"FWD"},{t:"FWD"},{t:"LEFT"},{t:"FWD"},{t:"FWD"}], desc: "Mengasah kemampuan mencari rute alternatif dengan memutari rintangan statis. Di sini kamu belajar memecah masalah besar menjadi sub-masalah kecil." },
+            { id: 4, title: "Parkir Mundur", icon: "fa-car", category: "Logika", grid: [6,6], start: {x:2, y:2, dir:2}, goal: {x:0, y:0}, obstacles: [[1,1]], palette: ["FWD", "RIGHT", "LEFT"], max: 15, minBlocks: 6, solution: [{t:"RIGHT"},{t:"FWD"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"},{t:"FWD"}], desc: "Melatih kemampuan koordinasi arah spasial. Robot dimulai dengan menghadap ke bawah, melatih logika perputaran yang berkebalikan dari biasanya." },
+            { id: 5, title: "Lompatan Kecil", icon: "fa-frog", category: "Lompat", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:3, y:0}, obstacles: [[1,0]], palette: ["FWD", "JUMP"], max: 10, minBlocks: 2, solution: [{t:"JUMP"}, {t:"FWD"}], desc: "Mengenalkan instruksi fungsi baru yaitu JUMP (Melompat). Berguna untuk melewati satu ubin penghalang rintangan tepat di depan robot." },
+            { id: 6, title: "Jalan Panjang", icon: "fa-road", category: "Perulangan", grid: [6,6], start: {x:0, y:5, dir:1}, goal: {x:5, y:5}, obstacles: [], palette: ["FWD", "REPEAT_N"], max: 10, minBlocks: 1, solution: [{t:"REPEAT_N", n:5, action:"FWD"}], desc: "Mulai mempelajari konsep efisiensi kode dengan struktur perulangan (Looping/Repeat N). Menghemat penulisan blok untuk instruksi berulang." },
+            { id: 7, title: "Naik Tangga", icon: "fa-stairs", category: "Perulangan", grid: [6,6], start: {x:0, y:5, dir:1}, goal: {x:2, y:3}, obstacles: [[1,5], [2,4]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "REPEAT_N"], max: 10, minBlocks: 3, solution: [{t:"JUMP"},{t:"LEFT"},{t:"JUMP"}], desc: "Kombinasi melompat secara diagonal searah tangga. Mengasah integrasi koordinasi motorik program." },
+            { id: 8, title: "Zig Zag", icon: "fa-bolt", category: "Perulangan", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:2, y:2}, obstacles: [], palette: ["FWD", "RIGHT", "LEFT", "REPEAT_N"], max: 15, minBlocks: 7, solution: [{t:"FWD"},{t:"RIGHT"},{t:"FWD"},{t:"LEFT"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"}], desc: "Menjelajahi rute simetris. Belajar melihat pola berulang berkala (Kanan-Maju-Kiri-Maju) untuk diselesaikan secara cerdas." },
+            { id: 9, title: "Lompat Jauh", icon: "fa-rocket", category: "Lompat", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:4, y:0}, obstacles: [[1,0], [3,0]], palette: ["FWD", "JUMP", "REPEAT_N"], max: 10, minBlocks: 1, solution: [{t:"REPEAT_N", n:2, action:"JUMP"}], desc: "Memadukan fungsi lompat di dalam sebuah struktur perulangan. Melompati dua rintangan berurutan dengan efisiensi kode yang maksimal." },
+            { id: 10, title: "Labirin Kecil", icon: "fa-puzzle-piece", category: "Gabungan", grid: [6,6], start: {x:0, y:0, dir:2}, goal: {x:5, y:5}, obstacles: [[1,4],[2,4],[3,4],[4,4],[1,3],[2,3],[3,3],[4,3]], palette: ["FWD", "LEFT", "RIGHT", "REPEAT_N"], max: 18, minBlocks: 3, solution: [{t:"REPEAT_N", n:5, action:"FWD"}, {t:"LEFT"}, {t:"REPEAT_N", n:5, action:"FWD"}], desc: "Mengelilingi batas dinding pembatas yang membelah grid. Diperlukan dua blok looping terpisah untuk mencapai target secara cepat." },
+            { id: 11, title: "Pilih Jalan", icon: "fa-code-branch", category: "Pengkondisian", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:5, y:0}, obstacles: [[2,0]], palette: ["FWD", "JUMP", "IF"], max: 12, minBlocks: 4, solution: [{t:"FWD"}, {t:"IF", action:"JUMP"}, {t:"FWD"}, {t:"FWD"}], desc: "Memulai logika percabangan (Conditionals / IF). Robot akan memeriksa kondisi lingkungan: jika ada rintangan buntu di depan, maka jalankan aksi alternatif." },
+            { id: 12, title: "Batu Beruntun", icon: "fa-cubes", category: "Logika", grid: [6,6], start: {x:0, y:2, dir:1}, goal: {x:5, y:2}, obstacles: [[2,2],[4,2]], palette: ["FWD", "JUMP", "REPEAT_N"], max: 12, minBlocks: 2, solution: [{t:"FWD"},{t:"REPEAT_N", n:2, action:"JUMP"}], desc: "Melintasi area bebatuan tidak beraturan dengan memadukan perulangan dan lompatan agar skrip Anda tidak melebihi kapasitas memori." },
+            { id: 13, title: "Putaran Kiri", icon: "fa-undo", category: "Logika", grid: [6,6], start: {x:3, y:3, dir:0}, goal: {x:2, y:2}, obstacles: [[3,2]], palette: ["FWD", "LEFT", "RIGHT"], max: 12, minBlocks: 4, solution: [{t:"LEFT"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"}], desc: "Membiasakan robot berputar ke kiri dalam ruang terbatas, menganalisis arah hadap (UTARA/SELATAN) secara matematis." },
+            { id: 14, title: "Jebakan", icon: "fa-skull", category: "Logika", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:4, y:4}, obstacles: [[1,0], [2,1], [3,2], [4,3]], palette: ["FWD", "RIGHT", "LEFT", "JUMP"], max: 18, minBlocks: 7, solution: [{t:"JUMP"},{t:"RIGHT"},{t:"JUMP"},{t:"LEFT"},{t:"JUMP"},{t:"RIGHT"},{t:"JUMP"}], desc: "Menghindari kotak rintangan miring berselang-seling. Dibutuhkan ketepatan kapan harus berbelok atau melompati area bahaya." },
+            { id: 15, title: "Lorong", icon: "fa-archway", category: "Gabungan", grid: [6,6], start: {x:0, y:2, dir:1}, goal: {x:5, y:2}, obstacles: [[0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[0,3],[1,3],[2,3],[3,3],[4,3],[5,3]], palette: ["FWD", "REPEAT_N"], max: 10, minBlocks: 1, solution: [{t:"REPEAT_N", n:5, action:"FWD"}], desc: "Melewati jalur lurus yang diapit oleh tembok pertahanan tebal. Sempurna untuk demonstrasi satu blok instruksi perulangan sekuensial sederhana." },
+            { id: 16, title: "Buntu", icon: "fa-ban", category: "Pengkondisian", grid: [6,6], start: {x:0, y:0, dir:2}, goal: {x:2, y:0}, obstacles: [[0,1]], palette: ["FWD", "RIGHT", "LEFT", "JUMP", "IF_ELSE"], max: 12, minBlocks: 3, solution: [{t:"IF_ELSE"},{t:"FWD"},{t:"FWD"}], desc: "Mempelajari logika kondisional ganda (IF-ELSE). Jika terhalang buntu, robot akan bergerak ke kiri, sebaliknya (jika jalan bebas) maka otomatis berbelok ke kanan." },
+            { id: 17, title: "Tarian Robot", icon: "fa-music", category: "Perulangan", grid: [6,6], start: {x:2, y:2, dir:1}, goal: {x:2, y:2}, obstacles: [], palette: ["FWD", "RIGHT", "LEFT", "REPEAT_N"], max: 15, minBlocks: 1, solution: [{t:"REPEAT_N", n:4, action:"RIGHT"}], desc: "Robot melakukan putaran melingkar di titik yang sama. Berguna melatih konsep kelipatan sudut putaran penuh (4x putaran 90 derajat = 360 derajat)." },
+            { id: 18, title: "Penyusup", icon: "fa-user-secret", category: "Gabungan", grid: [6,6], start: {x:0, y:5, dir:1}, goal: {x:5, y:0}, obstacles: [[1,4],[2,4],[3,4],[4,4],[1,3],[2,3],[3,3],[4,3]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "REPEAT_N"], max: 20, minBlocks: 3, solution: [{t:"REPEAT_N", n:5, action:"FWD"}, {t:"LEFT"}, {t:"REPEAT_N", n:5, action:"FWD"}], desc: "Tantangan tingkat lanjut merumuskan jalur melingkar luas menggunakan loop bertingkat secara teratur." },
+            { id: 19, title: "Master Logika", icon: "fa-brain", category: "Kompleks", grid: [6,6], start: {x:0, y:0, dir:2}, goal: {x:4, y:5}, obstacles: [[1,1],[3,3]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "IF_ELSE", "REPEAT_N"], max: 25, minBlocks: 6, solution: [{t:"FWD"},{t:"FWD"},{t:"LEFT"},{t:"REPEAT_N", n:4, action:"FWD"},{t:"RIGHT"},{t:"REPEAT_N", n:3, action:"FWD"}], desc: "Menguji seluruh insting pemrograman Anda. Kombinasikan navigasi manual dengan optimasi looping yang kompleks untuk menghindari jebakan spasial ganda." },
+            { id: 20, title: "Ujian Akhir", icon: "fa-graduation-cap", category: "Kompleks", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:5, y:5}, obstacles: [[1,2], [2,2], [3,2]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "REPEAT_N"], max: 30, minBlocks: 3, solution: [{t:"REPEAT_N", n:5, action:"FWD"}, {t:"RIGHT"}, {t:"REPEAT_N", n:5, action:"FWD"}], desc: "Evaluasi puncak petualangan logikamu. Selesaikan rute terjauh dengan seminimal mungkin penulisan blok skrip untuk mendapat predikat Master!" }
+        ];
+
+        const DummyDB = {
+            users: [
+                { id: "U01", username: "admin", password: "edudigital", role: "admin", nama_lengkap: "Guru Administrator", kelas: "-", tahun_pelajaran: "-" },
+                { id: "U02", username: "peserta", password: "edudigital", role: "peserta", nama_lengkap: "Siswa Penjelajah", kelas: "7A", tahun_pelajaran: "2025/2026" }
+            ],
+            progress: [ { username: "peserta", level_terbuka: 1, skor_total: 0, status: Array(50).fill(false) } ],
+            customLevels: []
+        };
+
+        const AppState = { 
+            user: null, 
+            progress: null, 
+            currentLevel: null, 
+            commands: [], 
+            isPlaying: false, 
+            helpLeft: 2, 
+            tempBlockConfig: null,
+            studentToDelete: null // Tampung username siswa yang akan dihapus
+        };
+
+        const Utils = {
+            showLoading: (msg = "Memproses...") => { 
+                document.getElementById('loading-text').innerText = msg; 
+                document.getElementById('loading-overlay').classList.remove('hidden'); 
+                document.getElementById('loading-overlay').classList.add('flex'); 
+            },
+            hideLoading: () => { 
+                document.getElementById('loading-overlay').classList.add('hidden'); 
+                document.getElementById('loading-overlay').classList.remove('flex'); 
+            },
+            showToast: (msg, type = "success") => {
+                const container = document.getElementById('toast-container');
+                const t = document.createElement('div');
+                const color = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+                t.className = `${color} text-white px-4 py-2.5 rounded shadow-lg fade-in flex items-center gap-2 text-sm font-bold`;
+                t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+                container.appendChild(t);
+                setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>t.remove(), 300); }, 3000);
+            }
+        };
+
+        const UI = {
+            views: ['login', 'register', 'peserta', 'admin'],
+            showView: (viewId) => { 
+                UI.views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden')); 
+                document.getElementById(`view-${viewId}`).classList.remove('hidden'); 
+                document.getElementById(`view-${viewId}`).classList.add('flex'); 
+                document.getElementById('user-menu').classList.toggle('hidden', viewId === 'login' || viewId === 'register'); 
+            },
+            showStudentMap: () => { 
+                document.getElementById('peserta-game').classList.add('hidden'); 
+                document.getElementById('peserta-map').classList.remove('hidden'); 
+                StudentUI.renderMap(); 
+            },
+            closeWelcomeModal: () => { 
+                document.getElementById('welcome-modal').classList.add('hidden'); 
+            }
+        };
+
+        const Auth = {
+            showRegisterView: () => {
+                document.getElementById('register-form').reset();
+                UI.showView('register');
+            },
+            showLoginView: () => {
+                document.getElementById('login-form').reset();
+                UI.showView('login');
+            },
+            login: async (e) => {
+                e.preventDefault(); 
+                const u = document.getElementById('login-user').value.trim(); 
+                const p = document.getElementById('login-pass').value.trim();
+                Utils.showLoading("Mencocokkan Data...");
+                
+                try {
+                    let res;
+                    if (IS_PREVIEW) { 
+                        await new Promise(r => setTimeout(r, 400)); // Kecepatan login ditingkatkan di preview
+                        const user = DummyDB.users.find(x => String(x.username) === String(u) && String(x.password) === String(p)); 
+                        if (user) { 
+                            const prog = DummyDB.progress.find(x => String(x.username) === String(u)) || { username: u, level_terbuka: 1, skor_total: 0, status: Array(50).fill(false) }; 
+                            res = { status: 'success', user: user, progress: prog }; 
+                        } else res = { status: 'error', message: 'Username/Password salah' }; 
+                    } else { 
+                        const fetchRes = await fetch(GAS_URL, { 
+                            method: 'POST', 
+                            body: new URLSearchParams({ action: 'login', username: u, password: p }) 
+                        }); 
+                        if(!fetchRes.ok) throw new Error("Gagal mengambil response");
+                        res = await fetchRes.json(); 
+                    }
+                    
+                    Utils.hideLoading();
+                    if (res.status === 'success') {
+                        AppState.user = res.user; 
+                        AppState.progress = res.progress;
+                        document.getElementById('user-name').innerText = res.user.nama_lengkap;
+                        document.getElementById('user-role-badge').innerText = res.user.role.toUpperCase();
+                        if (res.user.role === 'admin') { 
+                            UI.showView('admin'); 
+                            Admin.loadData(); 
+                        } else { 
+                            UI.showView('peserta'); 
+                            UI.showStudentMap(); 
+                            AppState.helpLeft = 2; 
+                        }
+                    } else {
+                        Utils.showToast(res.message, "error");
+                    }
+                } catch (err) { 
+                    Utils.hideLoading(); 
+                    console.error("Login Error:", err);
+                    Utils.showToast("Gagal terhubung ke Server. Pastikan Link GAS Valid.", "error"); 
+                }
+            },
+            register: async (e) => {
+                e.preventDefault();
+                const u = document.getElementById('reg-username').value.trim();
+                const p = document.getElementById('reg-password').value.trim();
+                const n = document.getElementById('reg-nama').value.trim();
+                const k = document.getElementById('reg-kelas').value.trim();
+                const t = document.getElementById('reg-tahun').value.trim();
+                
+                Utils.showLoading("Mendaftarkan Akun Siswa...");
+                try {
+                    let res;
+                    if (IS_PREVIEW) {
+                        await new Promise(r => setTimeout(r, 600));
+                        const exist = DummyDB.users.some(x => String(x.username) === String(u));
+                        if(exist) {
+                            res = { status: 'error', message: 'Username (NISN) sudah terdaftar!' };
+                        } else {
+                            const newUser = { id: "U" + Date.now(), username: u, password: p, role: "peserta", nama_lengkap: n, kelas: k, tahun_pelajaran: t };
+                            const newProg = { username: u, level_terbuka: 1, skor_total: 0, status: Array(50).fill(false) };
+                            DummyDB.users.push(newUser);
+                            DummyDB.progress.push(newProg);
+                            res = { status: 'success', user: newUser, progress: newProg };
+                        }
+                    } else {
+                        const fetchRes = await fetch(GAS_URL, {
+                            method: 'POST',
+                            body: new URLSearchParams({ action: 'register', username: u, password: p, nama: n, kelas: k, tahun_pelajaran: t })
+                        });
+                        if(!fetchRes.ok) throw new Error("Gagal kirim data pendaftaran");
+                        res = await fetchRes.json();
+                    }
+                    
+                    Utils.hideLoading();
+                    if(res.status === 'success') {
+                        Utils.showToast("Registrasi Berhasil! Selamat Datang.");
+                        AppState.user = res.user;
+                        AppState.progress = res.progress;
+                        document.getElementById('user-name').innerText = res.user.nama_lengkap;
+                        document.getElementById('user-role-badge').innerText = res.user.role.toUpperCase();
+                        UI.showView('peserta');
+                        UI.showStudentMap();
+                        AppState.helpLeft = 2;
+                    } else {
+                        Utils.showToast(res.message, "error");
+                    }
+                } catch(err) {
+                    Utils.hideLoading();
+                    Utils.showToast("Gagal mendaftar ke server GAS.", "error");
+                }
+            },
+            logout: () => { 
+                AppState.user = null; 
+                AppState.progress = null; 
+                document.getElementById('login-form').reset(); 
+                UI.showView('login'); 
+            }
+        };
+
+        const StudentUI = {
+            renderMap: () => {
+                const grid = document.getElementById('level-grid'); 
+                grid.innerHTML = '';
+                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
+                document.getElementById('student-score-display').innerText = AppState.progress.skor_total;
+                
+                allLevels.forEach((lvl, index) => {
+                    const isOpen = (index + 1) <= AppState.progress.level_terbuka;
+                    const isDone = AppState.progress.status[index];
+                    const bg = isDone ? 'bg-green-100 border-green-300 hover:shadow-md cursor-pointer' : (isOpen ? 'bg-white border-indigo-200 hover:border-primary hover:shadow-md cursor-pointer' : 'bg-gray-100 border-gray-200 opacity-60');
+                    const iconColor = isDone ? 'text-green-500' : (isOpen ? 'text-primary' : 'text-gray-400');
+                    const iconType = isDone ? 'fa-check-circle' : (isOpen ? lvl.icon : 'fa-lock');
+                    
+                    const el = document.createElement('div');
+                    el.className = `p-4 rounded-2xl border-2 transition text-center flex flex-col items-center justify-center ${bg}`;
+                    if (isOpen || isDone) {
+                        el.onclick = () => StudentUI.showLevelDetails(lvl);
+                    }
+                    
+                    el.innerHTML = `<div class="text-3xl mb-2 ${iconColor}"><i class="fas ${iconType}"></i></div><h4 class="font-bold text-dark text-sm leading-tight mb-1">${lvl.id}. ${lvl.title}</h4><p class="text-[10px] text-gray-500 font-semibold">${lvl.category}</p>`;
+                    grid.appendChild(el);
+                });
+            },
+            
+            // Pop-up Information Request
+            showLevelDetails: (lvl) => {
+                document.getElementById('lvl-info-title').innerText = `Level ${lvl.id}: ${lvl.title}`;
+                document.getElementById('lvl-info-category').innerText = lvl.category;
+                document.getElementById('lvl-info-desc').innerText = lvl.desc || "Mempelajari logika urutan rute dan pergerakan robot pintar.";
+                document.getElementById('lvl-info-max-blocks').innerText = `${lvl.max} Blok`;
+                document.getElementById('lvl-info-ideal').innerText = `${lvl.minBlocks} Blok`;
+                
+                const startBtn = document.getElementById('lvl-info-start-btn');
+                startBtn.onclick = () => {
+                    document.getElementById('level-info-modal').classList.add('hidden');
+                    Game.start(lvl.id);
+                };
+                
+                document.getElementById('level-info-modal').classList.remove('hidden');
+            },
+
+            draggedIdx: null,
+            allowDrop: (e) => e.preventDefault(),
+            dragStart: (e, idx) => { StudentUI.draggedIdx = idx; e.target.classList.add('dragging'); },
+            dragEnd: (e) => e.target.classList.remove('dragging'),
+            drop: (e) => {
+                e.preventDefault();
+                const targetWrap = e.target.closest('.cmd-wrap');
+                if(targetWrap && StudentUI.draggedIdx !== null) {
+                    const dropIdx = parseInt(targetWrap.dataset.idx);
+                    const item = AppState.commands.splice(StudentUI.draggedIdx, 1)[0];
+                    AppState.commands.splice(dropIdx, 0, item);
+                    StudentUI.renderCommands();
+                }
+                StudentUI.draggedIdx = null;
+            },
+
+            renderCommands: () => {
+                const list = document.getElementById('commands-list'); 
+                list.innerHTML = '';
+                const limitText = document.getElementById('block-limit-text');
+                limitText.innerText = `(${AppState.commands.length} / Maks ${AppState.currentLevel.max})`;
+                limitText.className = AppState.commands.length > AppState.currentLevel.max ? "text-danger animate-pulse" : "text-secondary";
+
+                if(AppState.commands.length === 0) { 
+                    list.innerHTML = '<div class="text-center text-gray-400 text-xs mt-8 border-2 border-dashed border-gray-300 rounded-lg p-4"><i class="fas fa-hand-pointer block text-2xl mb-2"></i> Klik tombol blok aksi di atas untuk merangkai skrip</div>'; 
+                    return; 
+                }
+                
+                AppState.commands.forEach((cmd, i) => {
+                    let label = ""; let color = ""; let icon = "";
+                    if(cmd.t === "FWD") { label = "Maju (1 Kotak)"; color = "bg-blue-100 text-blue-700 border-blue-200"; icon = "fa-arrow-up"; }
+                    else if(cmd.t === "RIGHT") { label = "Putar Kanan"; color = "bg-purple-100 text-purple-700 border-purple-200"; icon = "fa-redo"; }
+                    else if(cmd.t === "LEFT") { label = "Putar Kiri"; color = "bg-pink-100 text-pink-700 border-pink-200"; icon = "fa-undo"; }
+                    else if(cmd.t === "JUMP") { label = "Lompat Rintangan"; color = "bg-green-100 text-green-700 border-green-200"; icon = "fa-frog"; }
+                    else if(cmd.t === "REPEAT_N") { label = `Ulangi ${cmd.n}x: ${cmd.action}`; color = "bg-yellow-100 text-yellow-700 border-yellow-300"; icon = "fa-sync"; }
+                    else if(cmd.t === "IF") { label = `JIKA Buntu: ${cmd.action}`; color = "bg-orange-100 text-orange-700 border-orange-300"; icon = "fa-code-branch"; }
+                    else if(cmd.t === "IF_ELSE") { label = `JIKA Buntu: Kiri, ELSE: Kanan`; color = "bg-red-100 text-red-700 border-red-300"; icon = "fa-random"; }
+
+                    const el = document.createElement('div');
+                    el.className = `cmd-wrap flex items-center justify-between p-3 rounded-xl border ${color} font-bold text-xs shadow-sm cmd-block`;
+                    el.id = `cmd-${i}`; el.dataset.idx = i; el.draggable = true;
+                    el.ondragstart = (e) => StudentUI.dragStart(e, i);
+                    el.ondragend = (e) => StudentUI.dragEnd(e);
+                    
+                    el.innerHTML = `<div class="flex items-center gap-3"><i class="fas fa-bars text-gray-400 cursor-grab px-1"></i> <span><i class="fas ${icon} mr-1"></i> ${label}</span></div><button onclick="Game.removeCommand(${i})" class="text-gray-400 hover:text-red-500 px-2 transition"><i class="fas fa-times"></i></button>`;
+                    list.appendChild(el);
+                });
+            },
+
+            showConfigModal: (type) => {
+                AppState.tempBlockConfig = type;
+                document.getElementById('config-n-container').style.display = (type === 'REPEAT_N') ? 'block' : 'none';
+                document.getElementById('config-title').innerHTML = (type === 'REPEAT_N') ? '<i class="fas fa-sync text-yellow-500"></i> Set Perulangan' : '<i class="fas fa-code-branch text-orange-500"></i> Set Kondisi';
+                document.getElementById('config-modal').classList.remove('hidden');
+            },
+
+            saveConfigBlock: () => {
+                const type = AppState.tempBlockConfig;
+                const n = parseInt(document.getElementById('config-n-input').value) || 1;
+                const action = document.getElementById('config-action-input').value;
+                document.getElementById('config-modal').classList.add('hidden');
+                
+                if (AppState.commands.length >= AppState.currentLevel.max) { Utils.showToast("Batas blok tercapai!", "error"); return; }
+                if(type === 'REPEAT_N') AppState.commands.push({ t: "REPEAT_N", n: n, action: action });
+                else if(type === 'IF') AppState.commands.push({ t: "IF", action: action });
+                
+                StudentUI.renderCommands();
+            }
+        };
+
+        const Game = {
+            start: (levelId) => {
+                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
+                AppState.currentLevel = allLevels.find(l => l.id === levelId);
+                if (!AppState.currentLevel) return;
+
+                document.getElementById('peserta-map').classList.add('hidden');
+                document.getElementById('peserta-game').classList.remove('hidden');
+                document.getElementById('game-title').innerText = `Level ${AppState.currentLevel.id}: ${AppState.currentLevel.title}`;
+                document.getElementById('game-instruction').innerText = `Tuntun robot ke Bintang Hijau! Batas skrip: ${AppState.currentLevel.max} Blok`;
+                document.getElementById('help-count').innerText = AppState.helpLeft;
+                
+                AppState.commands = []; 
+                StudentUI.renderCommands();
+                GameEngine.initGrid(); 
+                GameEngine.draw();
+                
+                const pal = document.getElementById('block-palette'); 
+                pal.innerHTML = '';
+                const pData = [
+                    { t:"FWD", l:"Maju", c:"bg-blue-100 text-blue-700", i:"fa-arrow-up" }, 
+                    { t:"RIGHT", l:"Kanan", c:"bg-purple-100 text-purple-700", i:"fa-redo" },
+                    { t:"LEFT", l:"Kiri", c:"bg-pink-100 text-pink-700", i:"fa-undo" }, 
+                    { t:"JUMP", l:"Lompat", c:"bg-green-100 text-green-700", i:"fa-frog" },
+                    { t:"REPEAT_N", l:"Ulangi", c:"bg-yellow-100 text-yellow-700", i:"fa-sync", smart:true },
+                    { t:"IF", l:"Jika Buntu", c:"bg-orange-100 text-orange-700", i:"fa-code-branch", smart:true },
+                    { t:"IF_ELSE", l:"Jika-Else", c:"bg-red-100 text-red-700", i:"fa-random", smart:true }
+                ];
+                AppState.currentLevel.palette.forEach(pt => {
+                    const d = pData.find(x=>x.t===pt); 
+                    if(d) {
+                        const btn = document.createElement('button');
+                        btn.className = `${d.c} px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:shadow-md transition active:scale-95 flex items-center gap-1`;
+                        btn.innerHTML = `<i class="fas ${d.i}"></i> ${d.l}`;
+                        btn.onclick = () => { if(d.smart) StudentUI.showConfigModal(d.t); else Game.addCommand(d.t); };
+                        pal.appendChild(btn);
+                    }
+                });
+            },
+            addCommand: (t) => { 
+                if (AppState.commands.length >= AppState.currentLevel.max) { 
+                    Utils.showToast("Batas blok skrip tercapai!", "error"); 
+                    return; 
+                } 
+                AppState.commands.push({ t: t }); 
+                StudentUI.renderCommands(); 
+            },
+            removeCommand: (idx) => { 
+                AppState.commands.splice(idx, 1); 
+                StudentUI.renderCommands(); 
+            },
+            resetCommands: () => { 
+                AppState.commands = []; 
+                StudentUI.renderCommands(); 
+                GameEngine.initGrid(); 
+                GameEngine.draw(); 
+            },
+            useHelp: () => {
+                if(AppState.helpLeft <= 0) { Utils.showToast("Kuota Bantuan Habis!", "error"); return; }
+                if(!AppState.currentLevel.solution || AppState.currentLevel.solution.length === 0) { Utils.showToast("Bantuan tidak tersedia.", "error"); return; }
+                AppState.helpLeft--; 
+                document.getElementById('help-count').innerText = AppState.helpLeft;
+                AppState.commands = JSON.parse(JSON.stringify(AppState.currentLevel.solution)); 
+                StudentUI.renderCommands(); 
+                Utils.showToast("Bantuan disalin otomatis ke Area Skrip!");
+            },
+            run: async () => {
+                if(AppState.commands.length === 0) { Utils.showToast("Rangkai skrip terlebih dahulu!"); return; }
+                if(AppState.isPlaying) return; 
+                AppState.isPlaying = true;
+                
+                // Focus Screen to Top Request
+                // Menggulung halus ke halaman atas agar siswa dapat melihat animasi & blok bersamaan
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById('main-view-container').scrollTo({ top: 0, behavior: 'smooth' });
+                
+                GameEngine.initGrid(); 
+                GameEngine.draw();
+                
+                const flattenedCmds = [];
+                for(let c of AppState.commands) {
+                    if(c.t === 'REPEAT_N') { 
+                        for(let i=0; i<c.n; i++) flattenedCmds.push({t:c.action}); 
+                    } else {
+                        flattenedCmds.push(c);
+                    }
+                }
+
+                let success = true;
+                for (let i = 0; i < flattenedCmds.length; i++) {
+                    const cmd = flattenedCmds[i];
+                    const realIdx = Math.min(i, AppState.commands.length-1);
+                    document.querySelectorAll('.cmd-block').forEach(el => el.classList.remove('running'));
+                    const uiCmd = document.getElementById(`cmd-${realIdx}`);
+                    if (uiCmd) uiCmd.classList.add('running');
+                    
+                    const res = await GameEngine.executeStep(cmd);
+                    if (!res) { success = false; break; }
+                }
+
+                document.querySelectorAll('.cmd-block').forEach(el => el.classList.remove('running'));
+                AppState.isPlaying = false;
+                
+                if (success && GameEngine.robot.x === AppState.currentLevel.goal.x && GameEngine.robot.y === AppState.currentLevel.goal.y) {
+                    Game.win();
+                } else { 
+                    Utils.showToast("Algoritma belum tepat! Robot membentur rintangan atau di luar jalur.", "error"); 
+                }
+            },
+            win: async () => {
+                const used = AppState.commands.length;
+                const min = AppState.currentLevel.minBlocks;
+                const lvlId = AppState.currentLevel.id;
+                
+                let score = 100;
+                if(used > min) score -= (used - min) * 10;
+                if(score < 40) score = 40; 
+                
+                const isAlreadyBeaten = AppState.progress.status[lvlId - 1];
+
+                if (!isAlreadyBeaten) {
+                    AppState.progress.skor_total += score;
+                    AppState.progress.status[lvlId - 1] = true;
+                    if(lvlId >= AppState.progress.level_terbuka) {
+                        AppState.progress.level_terbuka = lvlId + 1;
+                    }
+                } else {
+                    score = 0; 
+                }
+
+                document.getElementById('level-score-earned').innerText = isAlreadyBeaten ? "+0 (Latihan Ulang)" : `+${score}`;
+                document.getElementById('level-total-score').innerText = AppState.progress.skor_total;
+                document.getElementById('score-bar').style.width = isAlreadyBeaten ? '100%' : `${score}%`;
+                document.getElementById('score-note').innerText = isAlreadyBeaten ? "Latihan ulang selesai!" : (score === 100 ? "Sempurna! Sangat Efisien (Blok Ideal)!" : `Kode berjalan! (Skrip: ${used} blok, Target Ideal: ${min} blok)`);
+                
+                document.getElementById('success-modal').classList.remove('hidden');
+                
+                if(!IS_PREVIEW && !isAlreadyBeaten) {
+                    try {
+                        fetch(GAS_URL, { 
+                            method: 'POST', 
+                            body: new URLSearchParams({ action: 'saveProgress', username: AppState.user.username, level: lvlId, score: score }) 
+                        });
+                    } catch(e) { console.error("Save Progress Error:", e); }
+                }
+            },
+            backToMap: () => { 
+                document.getElementById('success-modal').classList.add('hidden'); 
+                UI.showStudentMap(); 
+            },
+            playNextLevel: () => {
+                document.getElementById('success-modal').classList.add('hidden');
+                const nextLvlId = AppState.currentLevel.id + 1;
+                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
+                const nextLevelData = allLevels.find(l => l.id === nextLvlId);
+
+                if (nextLevelData) {
+                    StudentUI.showLevelDetails(nextLevelData);
+                } else { 
+                    Utils.showToast("Luar Biasa! Kamu berhasil menamatkan seluruh level ANDHALGO!", "success"); 
+                    UI.showStudentMap(); 
+                }
+            }
+        };
+
+        const GameEngine = {
+            robot: {x:0, y:0, dir:1}, 
+            grid: [],
+            initGrid: () => {
+                GameEngine.robot = { ...AppState.currentLevel.start };
+                const w = AppState.currentLevel.grid[0]; const h = AppState.currentLevel.grid[1];
+                GameEngine.grid = Array(h).fill().map(() => Array(w).fill(0));
+                AppState.currentLevel.obstacles.forEach(o => { if(GameEngine.grid[o[1]] !== undefined) GameEngine.grid[o[1]][o[0]] = 1; });
+            },
+            draw: () => {
+                const c = document.getElementById('canvas-grid'); 
+                c.innerHTML = '';
+                const w = AppState.currentLevel.grid[0]; const h = AppState.currentLevel.grid[1];
+                const cw = 300 / w; const ch = 300 / h;
+                
+                for(let y=0; y<h; y++) {
+                    for(let x=0; x<w; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = `absolute grid-cell border border-gray-100 ${GameEngine.grid[y][x] === 1 ? 'bg-gray-800' : 'bg-white'}`;
+                        cell.style.width = `${cw}px`; cell.style.height = `${ch}px`; cell.style.left = `${x*cw}px`; cell.style.top = `${y*ch}px`;
+                        c.appendChild(cell);
+                    }
+                }
+                const g = document.createElement('div');
+                g.className = 'absolute text-green-500 flex items-center justify-center text-3xl z-10 animate-bounce';
+                g.style.width = `${cw}px`; g.style.height = `${ch}px`; g.style.left = `${AppState.currentLevel.goal.x*cw}px`; g.style.top = `${AppState.currentLevel.goal.y*ch}px`;
+                g.innerHTML = '<i class="fas fa-star drop-shadow"></i>';
+                c.appendChild(g);
+
+                const r = document.createElement('div');
+                r.id = 'robot-sprite';
+                r.className = 'absolute text-primary flex items-center justify-center text-2xl z-20 robot drop-shadow-md bg-indigo-50 rounded-full border-2 border-primary';
+                r.style.width = `${cw*0.8}px`; r.style.height = `${ch*0.8}px`; 
+                r.style.left = `${GameEngine.robot.x*cw + cw*0.1}px`; r.style.top = `${GameEngine.robot.y*ch + ch*0.1}px`;
+                const rots = [0, 90, 180, 270]; 
+                r.style.transform = `rotate(${rots[GameEngine.robot.dir]}deg)`;
+                r.innerHTML = '<i class="fas fa-robot"></i>';
+                c.appendChild(r);
+            },
+            executeStep: async (cmd) => {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        let tx = GameEngine.robot.x; 
+                        let ty = GameEngine.robot.y;
+                        let valid = true;
+                        
+                        if(cmd.t === 'IF' || cmd.t === 'IF_ELSE') {
+                            let isBuntu = false;
+                            if(GameEngine.robot.dir===0 && ty-1<0) isBuntu=true; else if(GameEngine.robot.dir===0 && ty-1>=0 && GameEngine.grid[ty-1][tx]===1) isBuntu=true;
+                            if(GameEngine.robot.dir===1 && tx+1>=6) isBuntu=true; else if(GameEngine.robot.dir===1 && tx+1<6 && GameEngine.grid[ty][tx+1]===1) isBuntu=true;
+                            if(GameEngine.robot.dir===2 && ty+1>=6) isBuntu=true; else if(GameEngine.robot.dir===2 && ty+1<6 && GameEngine.grid[ty+1][tx]===1) isBuntu=true;
+                            if(GameEngine.robot.dir===3 && tx-1<0) isBuntu=true; else if(GameEngine.robot.dir===3 && tx-1>=0 && GameEngine.grid[ty][tx-1]===1) isBuntu=true;
+
+                            if(cmd.t === 'IF') { 
+                                cmd.t = isBuntu ? cmd.action : 'NONE'; 
+                            } else if(cmd.t === 'IF_ELSE') { 
+                                cmd.t = isBuntu ? 'LEFT' : 'RIGHT'; 
+                            }
+                        }
+
+                        if(cmd.t === "FWD") {
+                            if(GameEngine.robot.dir === 0) ty -= 1; 
+                            else if(GameEngine.robot.dir === 1) tx += 1; 
+                            else if(GameEngine.robot.dir === 2) ty += 1; 
+                            else if(GameEngine.robot.dir === 3) tx -= 1;
+                        } else if(cmd.t === "RIGHT") { 
+                            GameEngine.robot.dir = (GameEngine.robot.dir + 1) % 4; 
+                        } else if(cmd.t === "LEFT") { 
+                            GameEngine.robot.dir = (GameEngine.robot.dir + 3) % 4; 
+                        } else if(cmd.t === "JUMP") {
+                            if(GameEngine.robot.dir === 0) ty -= 2; 
+                            else if(GameEngine.robot.dir === 1) tx += 2; 
+                            else if(GameEngine.robot.dir === 2) ty += 2; 
+                            else if(GameEngine.robot.dir === 3) tx -= 2;
+                        }
+
+                        if(tx < 0 || tx >= 6 || ty < 0 || ty >= 6 || (cmd.t !== 'JUMP' && GameEngine.grid[ty][tx] === 1)) valid = false;
+                        if(cmd.t === 'JUMP' && valid && GameEngine.grid[ty][tx] === 1) valid = false; 
+                        
+                        if(valid) { 
+                            GameEngine.robot.x = tx; 
+                            GameEngine.robot.y = ty; 
+                            GameEngine.draw(); 
+                            resolve(true); 
+                        } else {
+                            resolve(false);
+                        }
+                    }, 400); // Kecepatan gerakan robot ditingkatkan untuk performa optimal
+                });
+            }
+        };
+
+        const Admin = {
+            currentData: [], 
+            filteredData: [], 
+            currentSort: null,
+            loadData: async () => {
+                const tbody = document.getElementById('admin-table-body'); 
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center p-6"><i class="fas fa-spinner fa-spin text-primary text-2xl"></i><p class="mt-2 text-gray-500">Mengambil data...</p></td></tr>';
+                try {
+                    let allData = [];
+                    if(IS_PREVIEW) {
+                        await new Promise(r => setTimeout(r, 400)); // Simulasi load cepat
+                        const peserta = DummyDB.users.filter(u => u.role === 'peserta');
+                        allData = peserta.map(u => { 
+                            const p = DummyDB.progress.find(x => String(x.username) === String(u.username)); 
+                            return { 
+                                username: u.username, 
+                                nama: u.nama_lengkap, 
+                                kelas: u.kelas || '-', 
+                                tahun_pelajaran: u.tahun_pelajaran || '-', 
+                                level: p ? p.level_terbuka : 1, 
+                                skor: p ? p.skor_total : 0, 
+                                status: p ? p.status : Array(50).fill(false) 
+                            }; 
+                        });
+                    } else { 
+                        const res = await fetch(`${GAS_URL}?action=getAdminData`); 
+                        const data = await res.json(); 
+                        allData = data.students; 
+                    }
+                    Admin.currentData = allData; 
+                    Admin.populateFilters(); 
+                    Admin.applyFilter();
+                } catch (e) { 
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4 text-danger">Gagal koneksi ke database.</td></tr>'; 
+                }
+            },
+            populateFilters: () => {
+                const fTahun = document.getElementById('filter-tahun'); 
+                const fKelas = document.getElementById('filter-kelas');
+                const tVal = fTahun.value; 
+                const kVal = fKelas.value;
+                const uTahun = [...new Set(Admin.currentData.map(d => d.tahun_pelajaran))].sort();
+                const uKelas = [...new Set(Admin.currentData.map(d => d.kelas))].sort();
+                
+                fTahun.innerHTML = '<option value="">Semua Tahun</option>'; 
+                uTahun.forEach(t => { if(t!=='-') fTahun.innerHTML += `<option value="${t}">${t}</option>`; }); 
+                fTahun.value = tVal;
+                
+                fKelas.innerHTML = '<option value="">Semua Kelas</option>'; 
+                uKelas.forEach(k => { if(k!=='-') fKelas.innerHTML += `<option value="${k}">${k}</option>`; }); 
+                fKelas.value = kVal;
+            },
+            sortBy: (key) => {
+                Admin.currentSort = key;
+                Admin.applyFilter();
+                Utils.showToast(`Diurutkan dari ${key === 'skor' ? 'Skor' : 'Level'} Tertinggi`, "success");
+            },
+            applyFilter: () => {
+                const t = document.getElementById('filter-tahun').value; 
+                const k = document.getElementById('filter-kelas').value;
+                const searchQ = document.getElementById('admin-search-input').value.toLowerCase().trim();
+                
+                // Filter pencarian nama siswa, kelas, dan tahun ajaran
+                Admin.filteredData = Admin.currentData.filter(d => {
+                    const matchTahun = (t === "" || d.tahun_pelajaran === t);
+                    const matchKelas = (k === "" || d.kelas === k);
+                    const matchNama = (searchQ === "" || d.nama.toLowerCase().includes(searchQ) || d.username.toLowerCase().includes(searchQ));
+                    return matchTahun && matchKelas && matchNama;
+                });
+                
+                if (Admin.currentSort) {
+                    Admin.filteredData.sort((a, b) => b[Admin.currentSort] - a[Admin.currentSort]);
+                }
+                Admin.renderTable();
+            },
+            renderTable: () => {
+                const tbody = document.getElementById('admin-table-body');
+                document.getElementById('admin-stat-siswa').innerText = Admin.filteredData.length; 
+                document.getElementById('admin-stat-level').innerText = Admin.filteredData.length > 0 ? Math.max(...Admin.filteredData.map(d=>d.level)) : 0; 
+                document.getElementById('admin-stat-skor').innerText = Admin.filteredData.length > 0 ? Math.max(...Admin.filteredData.map(d=>d.skor)) : 0;
+                tbody.innerHTML = '';
+                
+                if(Admin.filteredData.length === 0) { 
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center p-6 text-gray-500">Data siswa tidak ditemukan.</td></tr>'; 
+                    return; 
+                }
+                
+                Admin.filteredData.forEach(d => {
+                    let statusHtml = '<div class="flex gap-0.5 justify-center">';
+                    for(let i=0; i<20; i++) { 
+                        const c = d.status[i] ? 'bg-success' : 'bg-gray-200'; 
+                        statusHtml += `<div class="w-2.5 h-3 ${c} rounded-sm" title="Lvl ${i+1}"></div>`; 
+                    }
+                    statusHtml += '</div>';
+                    tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4 text-xs font-mono">${d.username}</td>
+                        <td class="p-4 font-bold text-dark text-sm">${d.nama}</td>
+                        <td class="p-4 text-center font-semibold text-gray-600">${d.kelas}</td>
+                        <td class="p-4 text-center text-xs text-gray-500">${d.tahun_pelajaran}</td>
+                        <td class="p-4 text-center"><span class="bg-indigo-100 text-primary px-2 py-1 rounded text-xs font-bold">${d.level}</span></td>
+                        <td class="p-4 text-right font-bold text-secondary text-sm">${d.skor}</td>
+                        <td class="p-4 text-center">${statusHtml}</td>
+                        <td class="p-4 text-center flex items-center justify-center gap-1">
+                            <button onclick="Admin.resetProgress('${d.username}')" class="bg-yellow-100 text-yellow-700 p-2 rounded-lg text-xs hover:bg-yellow-200 transition" title="Reset Progres"><i class="fas fa-undo"></i></button>
+                            <button onclick="Admin.confirmDelete('${d.username}', '${d.nama}')" class="bg-red-100 text-red-600 p-2 rounded-lg text-xs hover:bg-red-200 transition" title="Hapus Siswa"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>`;
+                });
+            },
+            showAddStudentModal: () => { 
+                document.getElementById('form-add-student').reset(); 
+                document.getElementById('add-student-modal').classList.remove('hidden'); 
+            },
+            submitAddStudent: async (e) => {
+                e.preventDefault(); 
+                const u = document.getElementById('add-s-user').value.trim(); 
+                const p = document.getElementById('add-s-pass').value.trim(); 
+                const n = document.getElementById('add-s-nama').value.trim(); 
+                const k = document.getElementById('add-s-kelas').value.trim(); 
+                const t = document.getElementById('add-s-tahun').value.trim();
+                
+                document.getElementById('add-student-modal').classList.add('hidden'); 
+                Utils.showLoading("Menambahkan data...");
+                
+                if(IS_PREVIEW) { 
+                    await new Promise(r=>setTimeout(r,500)); 
+                    DummyDB.users.push({id:"U"+Date.now(), username:u, password:p, role:"peserta", nama_lengkap:n, kelas:k, tahun_pelajaran:t}); 
+                    DummyDB.progress.push({username:u, level_terbuka:1, skor_total:0, status:Array(50).fill(false)}); 
+                } else { 
+                    try { 
+                        await fetch(GAS_URL, { 
+                            method:'POST', 
+                            body:new URLSearchParams({action:'addStudent', username:u, password:p, nama:n, kelas:k, tahun_pelajaran:t}) 
+                        }); 
+                    } catch(err){} 
+                }
+                Utils.hideLoading(); 
+                Utils.showToast("Siswa manual berhasil ditambahkan!"); 
+                Admin.loadData();
+            },
+            showUploadModal: () => { 
+                document.getElementById('file-upload-excel').value=''; 
+                document.getElementById('upload-student-modal').classList.remove('hidden'); 
+            },
+            downloadTemplate: () => {
+                const ws = XLSX.utils.json_to_sheet([ { "Username": "0123456789", "Password": "edudigital", "Nama Lengkap": "Ahmad", "Kelas": "7A", "Tahun Pelajaran": "2025/2026" } ]);
+                const wb = XLSX.utils.book_new(); 
+                XLSX.utils.book_append_sheet(wb, ws, "Siswa"); 
+                XLSX.writeFile(wb, "Template_Siswa.xlsx");
+            },
+            handleUploadExcel: () => {
+                const f = document.getElementById('file-upload-excel'); 
+                if(!f.files.length) return Utils.showToast("Pilih file!", "error");
+                const r = new FileReader();
+                r.onload = async (e) => {
+                    const data = new Uint8Array(e.target.result); 
+                    const wb = XLSX.read(data, {type: 'array'});
+                    const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false });
+                    
+                    const students = json.map(row => ({ 
+                        username: String(row['Username']||row['username']||'').trim(), 
+                        password: String(row['Password']||row['password']||'').trim(), 
+                        nama: row['Nama Lengkap']||row['nama'], 
+                        kelas: row['Kelas']||'-', 
+                        tahun_pelajaran: row['Tahun Pelajaran']||'-' 
+                    })).filter(s => s.username && s.nama);
+                    
+                    if(!students.length) return Utils.showToast("Format kosong", "error");
+                    document.getElementById('upload-student-modal').classList.add('hidden'); 
+                    Utils.showLoading("Mengunggah data massal...");
+                    
+                    if(IS_PREVIEW) { 
+                        await new Promise(r=>setTimeout(r,800)); 
+                        students.forEach(s=>{ 
+                            DummyDB.users.push({id:"U"+Date.now(), username:s.username, password:s.password, role:"peserta", nama_lengkap:s.nama, kelas:s.kelas, tahun_pelajaran:s.tahun_pelajaran}); 
+                            DummyDB.progress.push({username:s.username, level_terbuka:1, skor_total:0, status:Array(50).fill(false)}); 
+                        }); 
+                    } else { 
+                        try { 
+                            await fetch(GAS_URL, { 
+                                method:'POST', 
+                                body:new URLSearchParams({action:'uploadStudents', data:JSON.stringify(students)}) 
+                            }); 
+                        } catch(err){} 
+                    }
+                    Utils.hideLoading(); 
+                    Utils.showToast("Unggah massal siswa berhasil!"); 
+                    Admin.loadData();
+                }; 
+                r.readAsArrayBuffer(f.files[0]);
+            },
+            resetProgress: async (un) => {
+                Utils.showLoading("Mereset progres...");
+                if(IS_PREVIEW) { 
+                    await new Promise(r=>setTimeout(r,400)); 
+                    const p=DummyDB.progress.find(x=>String(x.username)===String(un)); 
+                    if(p){ p.level_terbuka=1; p.skor_total=0; p.status=Array(50).fill(false); } 
+                } else { 
+                    try { 
+                        await fetch(GAS_URL, { 
+                            method:'POST', 
+                            body:new URLSearchParams({action:'resetProgress', username:un}) 
+                        }); 
+                    } catch(err){} 
+                }
+                Utils.hideLoading(); 
+                Utils.showToast("Progres belajar siswa telah direset."); 
+                Admin.loadData();
+            },
+            
+            // Delete Student Request using Sleek Modal
+            confirmDelete: (un, nama) => {
+                AppState.studentToDelete = un;
+                document.getElementById('delete-student-name').innerText = `${nama} (${un})`;
+                document.getElementById('delete-confirm-modal').classList.remove('hidden');
+            },
+            closeDeleteModal: () => {
+                AppState.studentToDelete = null;
+                document.getElementById('delete-confirm-modal').classList.add('hidden');
+            },
+            executeDelete: async () => {
+                const un = AppState.studentToDelete;
+                if(!un) return;
+                
+                document.getElementById('delete-confirm-modal').classList.add('hidden');
+                Utils.showLoading("Menghapus data siswa...");
+                
+                try {
+                    if (IS_PREVIEW) {
+                        await new Promise(r => setTimeout(r, 500));
+                        DummyDB.users = DummyDB.users.filter(x => String(x.username) !== String(un));
+                        DummyDB.progress = DummyDB.progress.filter(x => String(x.username) !== String(un));
+                    } else {
+                        await fetch(GAS_URL, {
+                            method: 'POST',
+                            body: new URLSearchParams({ action: 'deleteStudent', username: un })
+                        });
+                    }
+                    Utils.hideLoading();
+                    Utils.showToast("Siswa berhasil dihapus dari sistem!");
+                    Admin.loadData();
+                } catch(err) {
+                    Utils.hideLoading();
+                    Utils.showToast("Gagal menghapus siswa dari server.", "error");
+                } finally {
+                    AppState.studentToDelete = null;
+                }
+            },
+
+            printReport: () => {
+                let html = `<html><head><title>Laporan ANDHALGO</title><style>body{font-family:sans-serif;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:left;} th{background:#eee;}</style></head><body><h2>Laporan Hasil Belajar ANDHALGO</h2><table><tr><th>No</th><th>Username</th><th>Nama</th><th>Kelas</th><th>Tahun</th><th>Level Terbuka</th><th>Skor</th></tr>`;
+                Admin.filteredData.forEach((d,i) => { html += `<tr><td>${i+1}</td><td>${d.username}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.tahun_pelajaran}</td><td>${d.level}</td><td>${d.skor}</td></tr>`; });
+                html += `</table></body></html>`; 
+                const win = window.open('','','width=800,height=600'); 
+                win.document.write(html); 
+                win.document.close(); 
+                win.print();
+            },
+            showAddLevelModal: () => document.getElementById('add-level-modal').classList.remove('hidden'),
+            generateLevelWithAI: async () => {
+                document.getElementById('add-level-modal').classList.add('hidden'); 
+                Utils.showLoading("AI meracik soal baru...");
+                const cat = document.getElementById('ai-level-cat').value;
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                try {
+                    if(IS_PREVIEW && !apiKey) {
+                        await new Promise(r=>setTimeout(r,1200));
+                        const newLvl = { 
+                            title: "AI: " + cat, 
+                            icon: "fa-robot", 
+                            category: "AI Gen", 
+                            grid: [6,6], 
+                            start: {x:0, y:0, dir:1}, 
+                            goal: {x:5, y:5}, 
+                            obstacles: [[2,2]], 
+                            palette: ["FWD", "RIGHT", "LEFT", "REPEAT_N"], 
+                            max: 10, 
+                            minBlocks: 6, 
+                            solution: [{t:"FWD"},{t:"FWD"}],
+                            desc: `Tantangan khusus hasil racikan otomatis sistem AI mengenai materi "${cat}".`
+                        };
+                        newLvl.id = 20 + DummyDB.customLevels.length + 1;
+                        DummyDB.customLevels.push(newLvl);
+                    } else {
+                        const prompt = `Buat soal game logika grid 6x6. Materi: "${cat}". Format JSON: {"title":"Judul","start":{"x":0,"y":0,"dir":1},"goal":{"x":5,"y":5},"obstacles":[[1,2]],"palette":["FWD","RIGHT","LEFT","JUMP","REPEAT_N"],"max":10,"minBlocks":5,"solution":[{"t":"FWD"}]}`;
+                        const payload = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
+                        const res = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        const data = await res.json();
+                        const newLvl = JSON.parse(data.candidates[0].content.parts[0].text);
+                        newLvl.icon = "fa-magic"; 
+                        newLvl.category = "AI Gen"; 
+                        newLvl.grid = [6,6]; 
+                        newLvl.id = 20 + DummyDB.customLevels.length + 1;
+                        newLvl.desc = `Uji kepintaran algoritmamu menggunakan racikan AI materi "${cat}".`;
+                        if(IS_PREVIEW) DummyDB.customLevels.push(newLvl); 
+                        else await fetch(GAS_URL, { method:'POST', body:newSearchParams({action:'addLevel', data:JSON.stringify(newLvl)}) });
+                    }
+                    Utils.hideLoading(); 
+                    Utils.showToast("Soal AI baru berhasil ditambahkan!"); 
+                    Admin.loadData();
+                } catch(err) { 
+                    Utils.hideLoading(); 
+                    Utils.showToast("Gagal meracik soal AI.", "error"); 
+                }
+            }
+        };
+
+        const App = { 
+            init: () => { 
+                UI.showView('login'); 
+                document.getElementById('welcome-modal').classList.remove('hidden');
+            } 
+        };
+        window.onload = App.init;
+    </script>
+</body>
+</html>
