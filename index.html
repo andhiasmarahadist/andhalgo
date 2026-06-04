@@ -324,7 +324,7 @@
                 <form id="form-register" onsubmit="event.preventDefault(); app.handleRegister();" class="space-y-5">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
-                        <input type="text" id="reg-name" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Cth: Budi Santoso">
+                        <input type="text" id="reg-name" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Contoh : Andhi Ganteng">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -341,17 +341,11 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label>
-                            <select id="reg-kelas" required class="block w-full py-3 px-4 border border-gray-200 bg-white/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-medium">
-                                <option value="" disabled selected>Pilih Kelas...</option>
-                                <option value="X PPLG 1">X PPLG 1</option>
-                                <option value="X PPLG 2">X PPLG 2</option>
-                                <option value="XI PPLG 1">XI PPLG 1</option>
-                                <option value="XII PPLG">XII PPLG</option>
-                            </select>
+                            <input type="text" id="reg-kelas" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Cth: X PPLG 1">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Tahun Pelajaran</label>
-                            <input type="text" id="reg-tahun" value="2023/2024" readonly class="block w-full sm:text-sm border-gray-200 bg-gray-100 rounded-xl py-3 px-4 border outline-none text-gray-500 cursor-not-allowed font-medium">
+                            <input type="text" id="reg-tahun" class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Cth: 2026/2027">
                         </div>
                     </div>
                     
@@ -584,7 +578,7 @@
                 <span class="font-bold text-sm text-gray-600">Andhalgo</span>
             </div>
             <p class="text-gray-400 text-sm text-center sm:text-left font-medium">
-                &copy; 2024 Dibuat untuk pembelajaran logika siswa.
+                Andhi Asmara Hadi @ 2026
             </p>
         </div>
     </footer>
