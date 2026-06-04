@@ -2,1144 +2,1141 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANDHALGO - Belajar Logika Jadi Petualangan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Logika Andhalgo - Platform Belajar Algoritma</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS for Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { primary: '#4F46E5', secondary: '#F59E0B', dark: '#1E293B', success: '#10B981', danger: '#EF4444' },
-                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        secondary: '#10B981', // Emerald-500
+                        dark: '#111827',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    },
+                    animation: {
+                        float: 'float 6s ease-in-out infinite',
+                    }
                 }
             }
         }
     </script>
-    
-    <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #F8FAFC; overflow-x: hidden; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .logo-block { background: linear-gradient(135deg, #4F46E5, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .grid-cell { transition: all 0.2s; }
-        .grid-cell.active { transform: scale(0.95); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        .robot { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        .cmd-block { cursor: grab; transition: transform 0.1s; }
-        .cmd-block:active { cursor: grabbing; transform: scale(0.98); }
-        .cmd-block.dragging { opacity: 0.5; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .cmd-block.running { border: 2px solid #F59E0B; box-shadow: 0 0 10px #F59E0B; background-color: #FEF3C7 !important; }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
-        /* Smooth scroll for game focus */
-        html { scroll-behavior: smooth; }
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            /* Background Pattern */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .page-transition {
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hide {
+            opacity: 0;
+            transform: scale(0.97) translateY(10px);
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+            z-index: -10;
+        }
+        
+        .show {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            position: relative;
+            z-index: 10;
+        }
+
+        .code-block {
+            background-color: #ffffff;
+            border-left: 4px solid #4f46e5;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .code-block:active {
+            cursor: grabbing;
+        }
+
+        .drop-zone {
+            min-height: 200px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #4f46e5;
+            background-color: #e0e7ff;
+        }
+
+        .loader {
+            border-top-color: #4f46e5;
+            -webkit-animation: spinner 1s linear infinite;
+            animation: spinner 1s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .text-gradient {
+            background: linear-gradient(to right, #4f46e5, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
-<body class="text-gray-800 h-screen flex flex-col">
+<body class="text-gray-800 antialiased overflow-x-hidden min-h-screen flex flex-col relative">
 
-    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-90 z-[9999] hidden flex-col items-center justify-center">
-        <div class="w-16 h-16 border-4 border-indigo-200 border-t-primary rounded-full animate-spin mb-4"></div>
-        <p id="loading-text" class="text-lg font-semibold text-dark">Memproses...</p>
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-24">
+                <!-- Logo & Brand -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center cursor-pointer group" onclick="app.navigate('home')">
+                        <!-- Logo Besar di Navbar -->
+                        <img src="https://i.imghippo.com/files/TEo9267qxU.png" alt="Logika Andhalgo Logo" class="h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Navigasi Kanan (Dinamis via JS) -->
+                <div class="flex items-center gap-4" id="nav-actions">
+                    <!-- Default state (Belum Login) -->
+                    <button onclick="app.navigate('login')" class="text-gray-600 hover:text-indigo-600 font-semibold px-4 py-2 rounded-lg transition-colors hidden sm:block">Masuk</button>
+                    <button onclick="app.navigate('register')" class="bg-indigo-600 text-white hover:bg-indigo-700 font-semibold px-6 py-2.5 rounded-xl shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] transition-all transform hover:-translate-y-0.5 hidden sm:block">Daftar Akun</button>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="sm:hidden text-gray-500 hover:text-indigo-600 focus:outline-none p-2 bg-gray-50 rounded-lg">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Drop down) -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-xl absolute w-full left-0 z-50">
+            <div class="px-4 pt-2 pb-4 space-y-2" id="mobile-nav-items">
+                <a href="#" onclick="app.navigate('login')" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">Masuk</a>
+                <a href="#" onclick="app.navigate('register')" class="block px-4 py-3 rounded-xl text-base font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Daftar Akun</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Loading Overlay -->
+    <div id="global-loader" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center">
+        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-4"></div>
+        <p class="text-indigo-600 font-bold tracking-wide animate-pulse" id="loader-text">MEMPROSES...</p>
     </div>
 
-    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2"></div>
-
-    <header class="bg-white shadow-sm border-b border-gray-200 py-3 px-6 flex justify-between items-center z-50 shrink-0 sticky top-0">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="if(!AppState.user) UI.showView('landing')">
-            <img src="https://i.imghippo.com/files/vZv7852lw.png" alt="Logo" class="h-10 w-auto object-contain">
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tight logo-block">ANDHALGO</h1>
-                <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Logika & Algoritma</p>
-            </div>
-        </div>
-        <div id="guest-menu" class="flex items-center gap-2">
-            <button onclick="UI.showView('login')" class="text-primary font-bold text-sm px-4 py-2 hover:bg-indigo-50 rounded-lg transition">Masuk</button>
-            <button onclick="UI.showView('register')" class="bg-primary text-white font-bold text-sm px-4 py-2 rounded-lg shadow hover:bg-indigo-600 transition hidden sm:block">Daftar</button>
-        </div>
-        <div id="user-menu" class="hidden flex items-center gap-4">
-            <div class="text-right hidden sm:block">
-                <p id="user-name" class="font-bold text-sm text-dark"></p>
-                <p id="user-role-badge" class="text-xs text-primary bg-indigo-50 inline-block px-2 py-0.5 rounded mt-0.5"></p>
-            </div>
-            <button onclick="Auth.logout()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600 transition flex justify-center items-center shadow-sm">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-    </header>
-
-    <main class="flex-grow flex flex-col overflow-y-auto relative bg-gray-50">
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         
-        <!-- View: Landing Page -->
-        <div id="view-landing" class="flex-grow flex flex-col bg-white overflow-y-auto w-full fade-in">
-            <!-- Hero Section -->
-            <div class="bg-gradient-to-b from-indigo-50 to-white py-16 px-6 text-center border-b border-gray-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-20 pointer-events-none">
-                    <i class="fas fa-code absolute top-10 left-10 text-6xl text-primary transform -rotate-12"></i>
-                    <i class="fas fa-robot absolute bottom-10 right-20 text-8xl text-purple-500 transform rotate-12"></i>
-                    <i class="fas fa-puzzle-piece absolute top-20 right-1/4 text-5xl text-yellow-500"></i>
+        <div id="view-home" class="view-section page-transition show">
+            
+            <!-- Hero Section 2 Kolom -->
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-12 pt-8 pb-20">
+                <!-- Kiri: Teks -->
+                <div class="flex-1 text-center lg:text-left z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-semibold mb-6 shadow-sm">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                        </span>
+                        LMS Generasi Baru
+                    </div>
+                    
+                    <h1 class="text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6">
+                        Belajar Logika,<br>
+                        <span class="text-gradient">Taklukkan Kode.</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Platform interaktif untuk siswa SMA/SMK dalam mengasah nalar algoritmik menggunakan <i>Visual Block Programming</i>. Pahami alurnya sebelum menulis sintaksnya!
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <button onclick="app.navigate('register')" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:shadow-[0_10px_25px_rgba(79,70,229,0.5)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+                            Mulai Belajar Sekarang <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button onclick="app.navigate('login')" class="bg-white text-gray-700 border border-gray-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all">
+                            Sudah Punya Akun
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="relative z-10 max-w-4xl mx-auto">
-                    <img src="https://i.imghippo.com/files/vZv7852lw.png" alt="ANDHALGO Logo" class="h-32 md:h-40 mx-auto mb-6 drop-shadow-xl animate-bounce" style="animation-duration: 3s;">
-                    <h1 class="text-4xl md:text-5xl font-extrabold text-dark mb-6 leading-tight">Belajar Logika Pemrograman <br><span class="text-primary">Jadi Petualangan Seru!</span></h1>
-                    <p class="text-gray-600 max-w-2xl mx-auto mb-8 text-lg font-medium">Platform interaktif untuk melatih cara berpikir algoritmik (Computational Thinking) melalui penyelesaian puzzle berbasis Block-Coding.</p>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <button onclick="UI.showView('register')" class="bg-primary text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-indigo-600 transition transform hover:-translate-y-1 text-lg"><i class="fas fa-rocket mr-2"></i> Mulai Petualangan</button>
-                        <button onclick="UI.showView('login')" class="bg-white text-dark border border-gray-200 font-bold py-3 px-8 rounded-xl shadow-sm hover:bg-gray-50 transition text-lg"><i class="fas fa-sign-in-alt mr-2"></i> Sudah Punya Akun?</button>
+                <!-- Kanan: Visual Logo -->
+                <div class="flex-1 relative z-10 w-full max-w-lg lg:max-w-none flex justify-center mt-10 lg:mt-0">
+                    <!-- Glow effect di belakang gambar -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-indigo-200/50 to-emerald-200/50 rounded-full blur-3xl -z-10"></div>
+                    
+                    <!-- Logo Utama (Animasi Float) -->
+                    <img src="https://i.imghippo.com/files/TEo9267qxU.png" alt="Logika Andhalgo" class="w-full max-w-[450px] lg:max-w-[550px] h-auto object-contain drop-shadow-2xl animate-float relative z-10">
+                    
+                    <!-- Floating Badge Kiri -->
+                    <div class="absolute -left-4 md:left-4 top-1/4 bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 z-20 animate-[float_5s_ease-in-out_infinite_1s]">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl font-bold">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Tanpa Error</p>
+                            <p class="font-bold text-gray-800">Visual Blocks</p>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Features -->
-            <div class="py-16 px-6 max-w-6xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-dark mb-2">Kenapa Belajar di ANDHALGO?</h2>
-                    <p class="text-gray-500">Cara paling menyenangkan memahami dasar-dasar coding.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition transform hover:-translate-y-1">
-                        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 transform -rotate-6 shadow-sm"><i class="fas fa-shapes"></i></div>
-                        <h3 class="text-xl font-bold mb-3 text-dark">Block Coding Visual</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Tidak perlu mengetik teks kode yang rumit. Cukup drag & drop blok perintah secara visual untuk merangkai logika program.</p>
-                    </div>
-                    <div class="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition transform hover:-translate-y-1">
-                        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 transform rotate-3 shadow-sm"><i class="fas fa-brain"></i></div>
-                        <h3 class="text-xl font-bold mb-3 text-dark">Latih Logika Terstruktur</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Dirancang untuk melatih pemikiran runtut mulai dari urutan sederhana, perulangan (looping), hingga percabangan bersyarat (IF-ELSE).</p>
-                    </div>
-                    <div class="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition transform hover:-translate-y-1">
-                        <div class="w-20 h-20 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 transform -rotate-3 shadow-sm"><i class="fas fa-trophy"></i></div>
-                        <h3 class="text-xl font-bold mb-3 text-dark">Berbasis Level & Skor</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Tantang dirimu! Selesaikan rintangan dengan kode se-efisien mungkin untuk mendapatkan skor sempurna dan membuka map baru.</p>
+                    
+                    <!-- Floating Badge Kanan -->
+                    <div class="absolute -right-4 md:right-0 bottom-1/4 bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 z-20 animate-[float_6s_ease-in-out_infinite_2s]">
+                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Level Base</p>
+                            <p class="font-bold text-gray-800">Misi Seru</p>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- How to Play -->
-            <div class="bg-dark py-16 px-6 text-white">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-3xl font-bold text-center mb-10 text-white">Cara Bermain</h2>
-                    <div class="space-y-6">
-                        <div class="flex items-start gap-4 bg-gray-800 p-6 rounded-2xl">
-                            <div class="bg-primary w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">1</div>
-                            <div><h4 class="font-bold text-lg mb-1 text-white">Pilih Level di Peta</h4><p class="text-gray-400 text-sm">Masuk ke akunmu dan pilih map/level yang terbuka. Perhatikan instruksi dan rintangan yang ada.</p></div>
-                        </div>
-                        <div class="flex items-start gap-4 bg-gray-800 p-6 rounded-2xl">
-                            <div class="bg-primary w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">2</div>
-                            <div><h4 class="font-bold text-lg mb-1 text-white">Susun Blok Perintah</h4><p class="text-gray-400 text-sm">Ambil blok dari kotak peralatan (kiri) ke area kerja (kanan). Urutkan logika agar robot bisa mencapai bintang tujuan.</p></div>
-                        </div>
-                        <div class="flex items-start gap-4 bg-gray-800 p-6 rounded-2xl">
-                            <div class="bg-primary w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shrink-0">3</div>
-                            <div><h4 class="font-bold text-lg mb-1 text-white">Jalankan Program</h4><p class="text-gray-400 text-sm">Klik 'Jalankan Program' dan perhatikan animasi robot mengeksekusi algoritmamu. Raih skor tertinggi!</p></div>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-10">
+                <div class="bg-white/60 backdrop-blur-lg p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:bg-white hover:-translate-y-2 transition-all duration-300 group cursor-default">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform shadow-inner"><i class="fas fa-puzzle-piece"></i></div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Tanpa Syntax Error</h3>
+                    <p class="text-gray-600 leading-relaxed">Susun blok logika tanpa takut salah ketik (Syntax Error). Siswa bisa lebih fokus 100% pada pemecahan masalah (Problem Solving).</p>
+                </div>
+                <div class="bg-white/60 backdrop-blur-lg p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:bg-white hover:-translate-y-2 transition-all duration-300 group cursor-default">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform shadow-inner"><i class="fas fa-level-up-alt"></i></div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Level Bertahap</h3>
+                    <p class="text-gray-600 leading-relaxed">Materi disusun ibarat game. Dari dasar hingga mahir. Dapatkan skor, kumpulkan poin, dan buka level materi berikutnya secara bertahap.</p>
+                </div>
+                <div class="bg-white/60 backdrop-blur-lg p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:bg-white hover:-translate-y-2 transition-all duration-300 group cursor-default">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform shadow-inner"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Dashboard Guru</h3>
+                    <p class="text-gray-600 leading-relaxed">Guru memiliki akses khusus untuk memantau kemajuan, melihat skor, dan mengontrol pembelajaran seluruh siswa secara real-time.</p>
                 </div>
             </div>
         </div>
 
-        <!-- View: Login -->
-        <div id="view-login" class="hidden flex-grow flex-col items-center justify-center p-4 w-full">
-            <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md fade-in text-center border border-gray-100 my-auto">
-                <img src="https://i.imghippo.com/files/vZv7852lw.png" alt="ANDHALGO Logo" class="h-24 w-auto object-contain mx-auto mb-4 drop-shadow-md">
-                <h2 class="text-2xl font-bold text-dark mb-1">Selamat Datang Kembali!</h2>
-                <p class="text-sm text-gray-500 mb-8">Masuk untuk melanjutkan petualangan logikamu.</p>
-                
-                <form id="login-form" onsubmit="Auth.login(event)">
-                    <div class="mb-4 text-left">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Username (NISN)</label>
-                        <input type="text" id="login-user" class="w-full border border-gray-300 bg-gray-50 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition" placeholder="Masukkan username..." required>
-                    </div>
-                    <div class="mb-6 text-left">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
-                        <input type="password" id="login-pass" class="w-full border border-gray-300 bg-gray-50 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition" placeholder="Masukkan password..." required>
-                    </div>
-                    <button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-indigo-600 hover:shadow-lg transition transform hover:-translate-y-0.5">
-                        <i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang
-                    </button>
-                </form>
-                <div class="mt-6 border-t border-gray-100 pt-6">
-                    <p class="text-sm text-gray-500">Belum punya akun? <button onclick="UI.showView('register')" class="text-primary font-bold hover:underline">Daftar disini</button></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- View: Register -->
-        <div id="view-register" class="hidden flex-grow flex-col items-center justify-center p-4 w-full">
-            <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md fade-in text-center border border-gray-100 my-auto">
-                <img src="https://i.imghippo.com/files/vZv7852lw.png" alt="ANDHALGO Logo" class="h-20 w-auto object-contain mx-auto mb-4 drop-shadow-md">
-                <h2 class="text-2xl font-bold text-dark mb-1">Buat Akun Baru</h2>
-                <p class="text-sm text-gray-500 mb-6">Mulai perjalanan belajarmu hari ini!</p>
-                
-                <form id="register-form" onsubmit="Auth.register(event)">
-                    <div class="grid grid-cols-2 gap-3 mb-3 text-left">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Username (NISN)</label>
-                            <input type="text" id="reg-user" class="w-full border border-gray-300 bg-gray-50 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-primary text-sm focus:bg-white" placeholder="Contoh: 001234" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Password</label>
-                            <input type="password" id="reg-pass" class="w-full border border-gray-300 bg-gray-50 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-primary text-sm focus:bg-white" placeholder="Sandi rahasia" required>
-                        </div>
-                    </div>
-                    <div class="mb-3 text-left">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap</label>
-                        <input type="text" id="reg-nama" class="w-full border border-gray-300 bg-gray-50 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-primary text-sm focus:bg-white" placeholder="Nama lengkapmu" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 mb-6 text-left">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Kelas</label>
-                            <input type="text" id="reg-kelas" class="w-full border border-gray-300 bg-gray-50 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-primary text-sm focus:bg-white" placeholder="Contoh: 7A" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Tahun Ajaran</label>
-                            <input type="text" id="reg-tahun" class="w-full border border-gray-300 bg-gray-50 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-primary text-sm focus:bg-white" placeholder="2025/2026" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-success text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-600 hover:shadow-lg transition transform hover:-translate-y-0.5">
-                        <i class="fas fa-user-plus mr-2"></i> Daftar & Mulai
-                    </button>
-                </form>
-                <div class="mt-5 border-t border-gray-100 pt-5">
-                    <p class="text-sm text-gray-500">Sudah punya akun? <button onclick="UI.showView('login')" class="text-primary font-bold hover:underline">Masuk disini</button></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- View: Peserta (Map & Game) -->
-        <div id="view-peserta" class="hidden flex-grow flex-col">
-            <!-- Peta Level -->
-            <div id="peserta-map" class="flex-grow p-4 md:p-8 overflow-y-auto fade-in">
-                <div class="max-w-5xl mx-auto">
-                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 mb-8 flex justify-between items-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-50 to-white opacity-90 z-0"></div>
-                        <div class="relative z-10">
-                            <h2 class="text-3xl font-extrabold text-dark mb-1">Peta Petualangan</h2>
-                            <p class="text-gray-500 text-sm font-medium">Pilih map yang terbuka untuk mengasah logikamu!</p>
-                        </div>
-                        <div class="relative z-10 text-right bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Total Skor Keseluruhan</p>
-                            <p id="student-score-display" class="text-4xl font-extrabold text-secondary leading-none">0</p>
-                        </div>
-                    </div>
-                    <div id="level-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                        <!-- Levels rendered here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Area Permainan -->
-            <div id="peserta-game" class="hidden flex-grow flex flex-col fade-in relative h-full">
-                <div class="bg-white border-b px-4 py-3 flex justify-between items-center shadow-sm z-10 shrink-0 sticky top-0">
-                    <button onclick="UI.showStudentMap()" class="text-gray-600 hover:text-primary font-bold transition flex items-center bg-gray-100 hover:bg-indigo-50 px-4 py-2 rounded-lg text-sm"><i class="fas fa-arrow-left mr-2"></i> Kembali ke Peta</button>
-                    <h3 id="game-title" class="font-bold text-dark text-lg hidden sm:block bg-indigo-50 text-primary px-4 py-1.5 rounded-lg border border-indigo-100">Level 1</h3>
-                    <div class="flex gap-2">
-                        <button onclick="Game.useHelp()" class="bg-purple-100 text-purple-700 px-3 py-2 rounded-lg text-sm font-bold hover:bg-purple-200 transition shadow-sm"><i class="fas fa-lightbulb"></i> Bantuan (<span id="help-count">2</span>)</button>
-                        <button onclick="Game.resetCommands()" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm font-bold hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash"></i> Hapus Semua</button>
-                    </div>
+        <!-- VIEW: Login -->
+        <div id="view-login" class="view-section page-transition hide flex justify-center items-center py-12">
+            <div class="glass-panel w-full max-w-md p-10 rounded-3xl relative shadow-2xl">
+                <!-- Mode Indicator -->
+                <div id="demo-mode-badge-login" class="absolute -top-3 -right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md hidden animate-pulse">
+                    Mode Demonstrasi
                 </div>
                 
-                <div id="game-container" class="flex-grow flex flex-col md:flex-row overflow-hidden bg-gray-50">
-                    <div class="w-full md:w-1/2 bg-white p-4 flex flex-col items-center justify-start md:justify-center border-b md:border-b-0 md:border-r border-gray-200 overflow-y-auto relative">
-                        <!-- Instruction Card -->
-                        <div class="bg-indigo-50 p-4 rounded-2xl shadow-sm border border-indigo-100 mb-6 w-full max-w-sm text-center relative mt-2 md:mt-0">
-                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow">Misi Kamu</div>
-                            <p id="game-instruction" class="text-sm text-gray-700 font-bold mt-2"></p>
-                        </div>
-                        
-                        <!-- Grid Board -->
-                        <div id="canvas-grid" class="relative bg-white shadow-xl rounded-xl border-4 border-gray-800 overflow-hidden transform transition hover:scale-[1.02]" style="width:300px; height:300px;">
-                            <!-- Grid rendering... -->
-                        </div>
-                    </div>
-
-                    <div class="w-full md:w-1/2 flex flex-col overflow-hidden bg-gray-50">
-                        <div class="p-3 bg-white border-b border-gray-200 flex flex-wrap gap-2 shrink-0 shadow-sm" id="block-palette"></div>
-                        
-                        <div class="flex-grow p-4 overflow-y-auto relative" id="block-workarea">
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider"><i class="fas fa-list-ol mr-1"></i> Area Skrip Program</p>
-                                <span id="block-limit-text" class="text-xs font-bold px-2 py-1 bg-white border rounded shadow-sm text-secondary">Maks 0 Blok</span>
+                <div class="text-center mb-10 flex flex-col items-center">
+                    <!-- Logo Super Besar -->
+                    <img src="https://i.imghippo.com/files/TEo9267qxU.png" alt="Logo Logika Andhalgo" class="h-32 w-auto mb-4 object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500">
+                    <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Selamat Datang</h2>
+                    <p class="text-sm text-gray-500 mt-2 font-medium">Masuk ke akun belajar Anda</p>
+                </div>
+                
+                <form id="form-login" onsubmit="event.preventDefault(); app.handleLogin();" class="space-y-6">
+                    <div>
+                        <label for="login-username" class="block text-sm font-semibold text-gray-700 mb-1.5">Username (NISN/NIP)</label>
+                        <div class="relative rounded-xl shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-indigo-400"></i>
                             </div>
-                            <div id="commands-list" class="flex flex-col gap-2 min-h-[250px] pb-10" ondragover="StudentUI.allowDrop(event)" ondrop="StudentUI.drop(event)"></div>
+                            <input type="text" id="login-username" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-11 sm:text-sm border-gray-200 rounded-xl py-3.5 border bg-white/50 outline-none transition-all" placeholder="Masukkan NISN Anda">
                         </div>
+                    </div>
+                    
+                    <div>
+                        <label for="login-password" class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+                        <div class="relative rounded-xl shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-indigo-400"></i>
+                            </div>
+                            <input type="password" id="login-password" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-11 sm:text-sm border-gray-200 rounded-xl py-3.5 border bg-white/50 outline-none transition-all" placeholder="••••••••">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full flex justify-center py-3.5 px-4 rounded-xl shadow-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5">
+                        Masuk Sistem
+                    </button>
+                </form>
+                
+                <div class="mt-8 text-center bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+                    <p class="text-sm text-gray-600 font-medium">Belum punya akun? <a href="#" onclick="app.navigate('register')" class="text-indigo-600 hover:text-indigo-700 font-bold hover:underline">Daftar sekarang</a></p>
+                    <p class="text-xs text-gray-400 mt-2">*Guru: gunakan username "admin"</p>
+                </div>
+            </div>
+        </div>
 
-                        <div class="p-4 bg-white border-t border-gray-200 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                            <button onclick="Game.run()" class="w-full bg-success text-white py-4 rounded-xl font-bold shadow-md hover:bg-green-600 hover:shadow-lg transition text-lg flex justify-center items-center gap-2 transform hover:-translate-y-0.5">
-                                <i class="fas fa-play-circle text-2xl"></i> Jalankan Program
+        <!-- VIEW: Register -->
+        <div id="view-register" class="view-section page-transition hide flex justify-center items-center py-8">
+            <div class="glass-panel w-full max-w-lg p-10 rounded-3xl relative shadow-2xl">
+                 <!-- Mode Indicator -->
+                 <div id="demo-mode-badge-reg" class="absolute -top-3 -right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md hidden animate-pulse">
+                    Mode Demonstrasi
+                </div>
+
+                <div class="text-center mb-8 flex flex-col items-center">
+                    <!-- Logo Super Besar -->
+                    <img src="https://i.imghippo.com/files/TEo9267qxU.png" alt="Logo Logika Andhalgo" class="h-28 w-auto mb-3 object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500">
+                    <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Buat Akun Siswa</h2>
+                    <p class="text-sm text-gray-500 mt-2 font-medium">Daftar untuk mulai petualangan logika</p>
+                </div>
+                
+                <form id="form-register" onsubmit="event.preventDefault(); app.handleRegister();" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="reg-name" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Cth: Budi Santoso">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Username (NISN)</label>
+                            <input type="text" id="reg-username" required class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Ketik NISN">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                            <input type="password" id="reg-password" required minlength="6" class="focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-200 rounded-xl py-3 px-4 border bg-white/50 outline-none transition-all" placeholder="Min. 6 Karakter">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label>
+                            <select id="reg-kelas" required class="block w-full py-3 px-4 border border-gray-200 bg-white/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-medium">
+                                <option value="" disabled selected>Pilih Kelas...</option>
+                                <option value="X PPLG 1">X PPLG 1</option>
+                                <option value="X PPLG 2">X PPLG 2</option>
+                                <option value="XI PPLG 1">XI PPLG 1</option>
+                                <option value="XII PPLG">XII PPLG</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tahun Pelajaran</label>
+                            <input type="text" id="reg-tahun" value="2023/2024" readonly class="block w-full sm:text-sm border-gray-200 bg-gray-100 rounded-xl py-3 px-4 border outline-none text-gray-500 cursor-not-allowed font-medium">
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" class="w-full flex justify-center py-3.5 px-4 rounded-xl shadow-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5">
+                            Daftar Sekarang
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600 font-medium">Sudah punya akun? <a href="#" onclick="app.navigate('login')" class="text-indigo-600 hover:text-indigo-700 font-bold hover:underline">Masuk di sini</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: Dashboard Siswa -->
+        <div id="view-student" class="view-section page-transition hide w-full h-full">
+            <!-- Header Student Info -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6 mb-6 flex flex-col md:flex-row justify-between items-center border border-gray-100">
+                <div class="flex items-center gap-4 mb-4 md:mb-0">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl font-extrabold uppercase shadow-lg shadow-indigo-200" id="student-avatar">
+                        S
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="student-name-display">Nama Siswa</h2>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-sm text-gray-500 font-medium">
+                            <span class="bg-gray-100/80 px-2.5 py-1 rounded-lg border border-gray-200 text-gray-700" id="student-class-display">Kelas</span>
+                            <span class="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-lg flex items-center shadow-sm">
+                                <i class="fas fa-star text-amber-400 mr-1.5 text-lg"></i> Skor: <span id="student-score" class="ml-1 font-bold">0</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 w-full md:w-auto">
+                    <button onclick="app.showLevelSelector()" class="flex-1 md:flex-none justify-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm">
+                        <i class="fas fa-map-marked-alt text-indigo-500"></i> Peta Level
+                    </button>
+                    <button onclick="app.logout()" class="flex-1 md:flex-none justify-center bg-red-50 text-red-600 hover:bg-red-100 px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all border border-red-100">
+                        <i class="fas fa-power-off"></i> Keluar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workspace Area (Playground) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
+                <!-- Kiri: Soal & Simulator -->
+                <div class="lg:col-span-5 flex flex-col gap-6">
+                    <!-- Panel Soal -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex-grow relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-10"></div>
+                        <div class="flex justify-between items-start mb-5 border-b border-gray-100 pb-4">
+                            <div>
+                                <span class="bg-indigo-100 text-indigo-800 text-xs px-2.5 py-1 rounded-md mb-2 inline-block font-extrabold uppercase tracking-widest" id="current-level-badge">Level 1</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-tight" id="mission-title">Misi Pertama</h3>
+                            </div>
+                        </div>
+                        <div class="prose prose-sm text-gray-600 mb-6 font-medium" id="mission-description">
+                            <p>Loading deskripsi misi...</p>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900 rounded-xl shadow-sm flex gap-3 items-start">
+                            <i class="fas fa-lightbulb text-amber-500 text-lg mt-0.5"></i>
+                            <div>
+                                <strong class="block mb-1">Petunjuk:</strong> 
+                                <span id="mission-hint">Gunakan blok yang tersedia.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulator Output -->
+                    <div class="bg-[#1e1e2e] rounded-2xl shadow-xl p-5 h-56 sm:h-64 relative overflow-hidden flex flex-col border border-gray-800">
+                        <!-- Mac OS style window buttons -->
+                        <div class="absolute top-3 left-4 flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-[#f38ba8]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#f9e2af]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#a6e3a1]"></div>
+                        </div>
+                        <div class="text-center text-[#bac2de] text-xs font-mono mb-3 uppercase tracking-widest border-b border-[#313244] pb-3 font-bold">Terminal Output</div>
+                        
+                        <div id="console-output" class="flex-grow font-mono text-sm text-[#a6e3a1] overflow-y-auto whitespace-pre-wrap flex flex-col gap-1 p-2 custom-scrollbar">
+                            <div class="text-[#6c7086]">Menunggu kompilasi program...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kanan: Blockly Editor -->
+                <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+                    <div class="border-b border-gray-100 p-4 bg-gray-50/80 flex justify-between items-center">
+                        <h3 class="font-extrabold text-gray-800 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600"><i class="fas fa-code"></i></div>
+                            Area Logika
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="logicWorkspace.clear()" class="text-gray-400 hover:text-red-500 hover:bg-red-50 w-10 h-10 flex items-center justify-center rounded-lg transition-colors" title="Bersihkan Area">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button onclick="logicWorkspace.run()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                                <i class="fas fa-play"></i> Jalankan Code
                             </button>
                         </div>
                     </div>
+                    
+                    <div class="flex-grow p-5 grid grid-cols-1 md:grid-cols-12 gap-5 bg-white relative">
+                        <!-- Block Toolbox -->
+                        <div class="md:col-span-4 bg-gray-50/50 border border-gray-200 rounded-xl p-4 h-[400px] overflow-y-auto custom-scrollbar shadow-inner">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-cubes"></i> Blok Tersedia</h4>
+                            <div id="toolbox" class="flex flex-col gap-2.5">
+                                <!-- Blok JS -->
+                            </div>
+                        </div>
+
+                        <!-- Drop Zone -->
+                        <div class="md:col-span-8">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-stream"></i> Urutan Eksekusi</h4>
+                            <div id="workspace-dropzone" class="drop-zone h-[380px] overflow-y-auto flex flex-col gap-2 relative custom-scrollbar">
+                                <div id="empty-workspace-msg" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
+                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                        <i class="fas fa-hand-pointer text-2xl text-gray-300"></i>
+                                    </div>
+                                    <p class="text-sm font-medium">Tarik (Drag) blok ke area ini</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- View: Admin Dashboard -->
-        <div id="view-admin" class="hidden flex-grow bg-gray-50 overflow-y-auto p-4 md:p-8 fade-in">
-            <div class="max-w-6xl mx-auto">
-                <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <!-- VIEW: Dashboard Admin -->
+        <div id="view-admin" class="view-section page-transition hide w-full">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b border-gray-100 pb-5 gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-200"><i class="fas fa-chalkboard-teacher"></i></div>
                     <div>
-                        <h2 class="text-2xl font-extrabold text-dark flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-primary"></i> Dashboard Guru</h2>
-                        <p class="text-gray-500 text-sm mt-1">Pantau progres siswa dan kelola konfigurasi LMS.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="Admin.showAddStudentModal()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 transition"><i class="fas fa-user-plus text-primary mr-1"></i> Tambah Manual</button>
-                        <button onclick="Admin.showUploadModal()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 transition"><i class="fas fa-file-excel text-green-600 mr-1"></i> Upload Excel</button>
-                        <button onclick="Admin.showAddLevelModal()" class="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-indigo-600 transition"><i class="fas fa-magic mr-1"></i> Buat Soal AI</button>
+                        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight">Panel Guru</h2>
+                        <p class="text-sm text-gray-500 font-medium">Kelola siswa dan pantau perkembangan kelas.</p>
                     </div>
                 </div>
+                <button onclick="app.logout()" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-power-off"></i>Keluar
+                </button>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
-                        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-2xl shadow-inner"><i class="fas fa-users"></i></div>
-                        <div><p class="text-gray-500 text-sm font-semibold mb-1">Total Siswa Terdaftar</p><h3 id="admin-stat-siswa" class="text-3xl font-extrabold text-dark">0</h3></div>
-                    </div>
-                    <div onclick="Admin.sortBy('level')" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:border-primary transition group">
-                        <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 text-2xl shadow-inner group-hover:scale-110 transition"><i class="fas fa-map-marked-alt"></i></div>
-                        <div><p class="text-gray-500 text-sm font-semibold mb-1">Max Level Dicapai <i class="fas fa-sort text-xs ml-1 text-gray-300"></i></p><h3 id="admin-stat-level" class="text-3xl font-extrabold text-dark">0</h3></div>
-                    </div>
-                    <div onclick="Admin.sortBy('skor')" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:border-primary transition group">
-                        <div class="w-14 h-14 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-2xl shadow-inner group-hover:scale-110 transition"><i class="fas fa-trophy"></i></div>
-                        <div><p class="text-gray-500 text-sm font-semibold mb-1">Skor Tertinggi <i class="fas fa-sort text-xs ml-1 text-gray-300"></i></p><h3 id="admin-stat-skor" class="text-3xl font-extrabold text-dark">0</h3></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Stats Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl"><i class="fas fa-users"></i></div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Siswa</p>
+                        <p class="text-3xl font-black text-gray-900 leading-none" id="admin-stat-users">0</p>
                     </div>
                 </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 text-2xl"><i class="fas fa-chart-bar"></i></div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Rata-rata Skor</p>
+                        <p class="text-3xl font-black text-gray-900 leading-none" id="admin-stat-score">0</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 text-2xl"><i class="fas fa-layer-group"></i></div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Level Aktif</p>
+                        <p class="text-3xl font-black text-gray-900 leading-none">3</p>
+                    </div>
+                </div>
+                <div class="flex flex-col justify-center gap-3">
+                    <button onclick="app.adminRefreshData()" class="w-full bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:shadow-sm px-4 py-3 rounded-xl font-bold text-sm transition-all flex justify-center items-center gap-2">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                    <button onclick="Swal.fire('Info', 'Modul generator soal sedang dikerjakan.', 'info')" class="w-full bg-amber-50 text-amber-700 hover:bg-amber-100 hover:shadow-sm px-4 py-3 rounded-xl font-bold text-sm transition-all flex justify-center items-center gap-2">
+                        <i class="fas fa-magic"></i> Soal Baru
+                    </button>
+                </div>
+            </div>
 
-                <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-200">
-                    <div class="p-5 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-gray-50/50 gap-4">
-                        <h3 class="text-lg font-bold text-dark flex items-center gap-2"><i class="fas fa-chart-line text-primary"></i> Laporan Progres</h3>
-                        <div class="flex flex-wrap gap-3 items-center w-full lg:w-auto">
-                            <!-- Search by Name -->
-                            <div class="relative w-full md:w-auto flex-grow lg:flex-grow-0">
-                                <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-                                <input type="text" id="filter-search" oninput="Admin.applyFilter()" placeholder="Cari nama/NISN..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
-                            </div>
-                            
-                            <select id="filter-tahun" onchange="Admin.applyFilter()" class="border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary outline-none"><option value="">Semua Tahun</option></select>
-                            <select id="filter-kelas" onchange="Admin.applyFilter()" class="border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary outline-none"><option value="">Semua Kelas</option></select>
-                            
-                            <div class="flex gap-2">
-                                <button onclick="Admin.printReport()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-100 transition shadow-sm font-bold text-sm"><i class="fas fa-print"></i></button>
-                                <button onclick="Admin.loadData()" class="bg-primary text-white px-4 py-2 rounded-xl hover:bg-indigo-600 transition shadow-sm font-bold text-sm"><i class="fas fa-sync-alt"></i></button>
-                            </div>
-                        </div>
+            <!-- Tabel -->
+            <div class="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50/50">
+                    <h3 class="text-lg font-bold text-gray-900">Daftar Kemajuan Siswa</h3>
+                    <div class="relative w-full sm:w-auto">
+                        <input type="text" id="admin-search" onkeyup="app.filterAdminTable()" placeholder="Cari nama atau NISN..." class="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none w-full sm:w-72 bg-white shadow-sm">
+                        <i class="fas fa-search absolute left-3.5 top-3.5 text-gray-400"></i>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[1000px]">
-                            <thead>
-                                <tr class="bg-white text-gray-500 border-b border-gray-200 text-sm">
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs">Siswa / NISN</th>
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs text-center">Kelas</th>
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs text-center">Tahun</th>
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs text-center">Lvl Terbuka</th>
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs text-right">Total Skor</th>
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs text-center">Status Map (20)</th>
-                                    <th class="p-4 font-semibold uppercase tracking-wider text-xs text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-table-body"></tbody>
-                        </table>
-                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-100" id="students-table">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Profil Siswa</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Kelas</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Progress Level</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Skor Total</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100" id="admin-table-body">
+                            <tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 font-medium">Klik "Refresh Data" untuk memuat data dari database.</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="bg-white border-t border-gray-200 py-4 text-center z-10 shrink-0">
-        <p class="text-sm text-gray-500 font-semibold">&copy; 2026 ANDHALGO - Andhi Asmara Hadi. All rights reserved.</p>
+    <!-- Modal Level Map -->
+    <div id="level-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl mx-4 transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[90vh]" id="level-modal-content">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50">
+                <h3 class="text-xl font-extrabold text-gray-900 flex items-center gap-2"><div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fas fa-map"></i></div> Peta Pembelajaran</h3>
+                <button onclick="app.closeLevelSelector()" class="text-gray-400 hover:text-red-500 focus:outline-none w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 md:p-8 overflow-y-auto bg-gray-50 flex-grow">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="level-grid">
+                    <!-- Cards -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-100 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 opacity-50 grayscale">
+                <img src="https://i.imghippo.com/files/TEo9267qxU.png" class="h-6">
+                <span class="font-bold text-sm text-gray-600">Andhalgo</span>
+            </div>
+            <p class="text-gray-400 text-sm text-center sm:text-left font-medium">
+                &copy; 2024 Dibuat untuk pembelajaran logika siswa.
+            </p>
+        </div>
     </footer>
 
-    <!-- ==================== MODALS ==================== -->
-    
-    <!-- Level Info Pop-Up (Edukatif) -->
-    <div id="level-info-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[10000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl relative overflow-hidden text-center">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-purple-500"></div>
-            <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-5 transform rotate-3 shadow-sm border border-indigo-100 text-primary text-4xl" id="info-lvl-icon">
-                <i class="fas fa-map-signs"></i>
-            </div>
-            <h2 class="text-2xl font-extrabold text-dark mb-1" id="info-lvl-title">Level 1</h2>
-            <div class="inline-block bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-5" id="info-lvl-cat">Materi Dasar</div>
-            
-            <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-600 mb-6 border border-gray-100 text-left">
-                <p class="font-bold text-gray-700 mb-1"><i class="fas fa-graduation-cap text-primary mr-1"></i> Apa yang dipelajari?</p>
-                <p id="info-lvl-desc" class="leading-relaxed">Di level ini, kamu akan memandu robot menggunakan instruksi logis untuk mencapai target.</p>
-            </div>
-            
-            <div class="flex gap-3">
-                <button onclick="document.getElementById('level-info-modal').classList.add('hidden')" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition text-sm">Tutup</button>
-                <button id="btn-start-lvl" class="w-2/3 bg-primary text-white font-bold py-3 rounded-xl shadow-md hover:bg-indigo-600 transition text-sm">Mulai Main <i class="fas fa-play ml-1"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[10000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform transition-transform scale-95 relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-green-100 rounded-full opacity-50"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-yellow-100 rounded-full opacity-50"></div>
-            
-            <div class="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg border-4 border-white relative z-10">
-                <i class="fas fa-star text-5xl text-white drop-shadow-md"></i>
-            </div>
-            <h2 class="text-3xl font-extrabold text-dark mb-2 relative z-10">Luar Biasa!</h2>
-            <p class="text-gray-500 mb-5 relative z-10 font-medium">Kamu berhasil menyelesaikan logika ini.</p>
-            
-            <div class="bg-white rounded-2xl p-5 mb-6 border border-gray-100 shadow-sm relative z-10">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-sm font-bold text-gray-500">Skor Kode Skrip:</span>
-                    <span id="level-score-earned" class="text-2xl font-black text-success drop-shadow-sm">+100</span>
-                </div>
-                <div class="flex justify-between items-center mb-3 pt-3 border-t border-gray-100">
-                    <span class="text-sm font-bold text-gray-500">Total Keseluruhan:</span>
-                    <span id="level-total-score" class="text-xl font-bold text-primary">0</span>
-                </div>
-                <div class="w-full bg-gray-100 rounded-full h-3 mt-3 overflow-hidden shadow-inner">
-                    <div id="score-bar" class="bg-gradient-to-r from-success to-green-400 h-3 rounded-full transition-all duration-1000" style="width: 100%"></div>
-                </div>
-                <p id="score-note" class="text-xs font-bold text-center mt-3 p-2 rounded bg-gray-50 text-gray-600">Sangat efisien!</p>
-            </div>
-            
-            <div class="flex gap-2 relative z-10">
-                <button onclick="Game.backToMap()" class="w-1/3 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl border border-gray-200 hover:bg-gray-200 transition text-sm">Ke Peta</button>
-                <button onclick="Game.playNextLevel()" class="w-2/3 bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-indigo-600 transition text-sm">Lanjut Level <i class="fas fa-arrow-right ml-1"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[10000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-exclamation-triangle text-3xl text-danger"></i>
-            </div>
-            <h3 class="text-xl font-bold text-dark mb-2">Hapus Siswa?</h3>
-            <p class="text-sm text-gray-500 mb-6">Semua data akun dan progres level akan hilang permanen. Lanjutkan?</p>
-            <div class="flex gap-2">
-                <button onclick="document.getElementById('delete-modal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-                <button id="btn-confirm-delete" class="flex-1 bg-danger text-white font-bold py-2.5 rounded-xl shadow hover:bg-red-600 transition">Ya, Hapus</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="config-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[10000] hidden flex items-center justify-center px-4 fade-in backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-gray-100">
-            <h3 id="config-title" class="text-xl font-extrabold mb-5 text-dark border-b border-gray-100 pb-3"><i class="fas fa-cog text-primary"></i> Pengaturan Blok</h3>
-            <div id="config-n-container" class="mb-5">
-                <label class="block text-sm font-bold text-gray-700 mb-2">Jumlah Perulangan (Berapa Kali?):</label>
-                <input type="number" id="config-n-input" min="1" max="20" value="2" class="border-2 border-gray-200 p-3 rounded-xl w-full focus:ring-0 focus:border-primary text-xl font-black text-center bg-gray-50 transition">
-            </div>
-            <div class="mb-6">
-                <label class="block text-sm font-bold text-gray-700 mb-2">Perintah yang diulang / Dieksekusi:</label>
-                <select id="config-action-input" class="border-2 border-gray-200 p-3 rounded-xl w-full focus:ring-0 focus:border-primary bg-white font-bold text-gray-700 transition appearance-none">
-                    <option value="FWD">Maju (Forward)</option>
-                    <option value="RIGHT">Putar Kanan</option>
-                    <option value="LEFT">Putar Kiri</option>
-                    <option value="JUMP">Lompat (Jump)</option>
-                </select>
-            </div>
-            <div class="flex gap-3 justify-end">
-                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-200 transition">Batal</button>
-                <button onclick="StudentUI.saveConfigBlock()" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow hover:bg-indigo-600 transition">Simpan Blok</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Modals (Add, Upload, Generate AI) are retained with slight aesthetic tweaks to rounded-3xl -->
-    <div id="add-student-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 class="text-xl font-extrabold mb-4 text-dark border-b pb-3"><i class="fas fa-user-plus text-primary"></i> Tambah Akun Siswa</h3>
-            <form id="form-add-student" onsubmit="Admin.submitAddStudent(event)">
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div><label class="block text-xs font-bold text-gray-700 mb-1">NISN (Username)</label><input type="text" id="add-s-user" class="border border-gray-300 bg-gray-50 p-2.5 rounded-xl w-full text-sm focus:bg-white focus:border-primary outline-none transition" required></div>
-                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Password</label><input type="text" id="add-s-pass" value="edudigital" class="border border-gray-300 bg-gray-50 p-2.5 rounded-xl w-full text-sm focus:bg-white focus:border-primary outline-none transition" required></div>
-                </div>
-                <div class="mb-3"><label class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap</label><input type="text" id="add-s-nama" class="border border-gray-300 bg-gray-50 p-2.5 rounded-xl w-full text-sm focus:bg-white focus:border-primary outline-none transition" required></div>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Kelas</label><input type="text" id="add-s-kelas" placeholder="7A" class="border border-gray-300 bg-gray-50 p-2.5 rounded-xl w-full text-sm focus:bg-white focus:border-primary outline-none transition" required></div>
-                    <div><label class="block text-xs font-bold text-gray-700 mb-1">Tahun Ajaran</label><input type="text" id="add-s-tahun" placeholder="2025/2026" class="border border-gray-300 bg-gray-50 p-2.5 rounded-xl w-full text-sm focus:bg-white focus:border-primary outline-none transition" required></div>
-                </div>
-                <div class="flex gap-2 justify-end">
-                    <button type="button" onclick="document.getElementById('add-student-modal').classList.add('hidden')" class="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-200">Batal</button>
-                    <button type="submit" class="bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow hover:bg-indigo-600">Simpan Data</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="upload-student-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 class="text-xl font-extrabold mb-2 text-dark border-b pb-3"><i class="fas fa-file-excel text-green-600"></i> Upload Data Massal</h3>
-            <p class="text-sm text-gray-600 mb-5 mt-3">Unggah banyak data siswa sekaligus menggunakan file Excel (.xlsx)</p>
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5 text-center">
-                <button onclick="Admin.downloadTemplate()" class="text-blue-700 font-bold text-sm hover:underline flex items-center justify-center mx-auto gap-2"><i class="fas fa-download"></i> Download Template Format</button>
-            </div>
-            <div class="mb-6">
-                <input type="file" id="file-upload-excel" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer">
-            </div>
-            <div class="flex gap-2 justify-end">
-                <button onclick="document.getElementById('upload-student-modal').classList.add('hidden')" class="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-200">Batal</button>
-                <button onclick="Admin.handleUploadExcel()" class="bg-green-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow hover:bg-green-700">Proses Upload</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="add-level-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100000] hidden flex items-center justify-center px-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 class="text-xl font-extrabold mb-3 text-dark border-b pb-3"><i class="fas fa-magic text-primary"></i> Racik Soal via AI</h3>
-            <div class="mb-6 mt-3">
-                <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Topik Tantangan</label>
-                <select id="ai-level-cat" class="w-full border-2 border-gray-200 bg-gray-50 p-3 rounded-xl focus:ring-0 focus:border-primary font-semibold text-gray-700 outline-none">
-                    <option value="Logika Maju Belok Sederhana">Logika Maju/Belok (Dasar)</option>
-                    <option value="Perulangan (Looping) Rintangan Banyak">Perulangan / Looping (Menengah)</option>
-                    <option value="Pengkondisian dan Lompat Kompleks">Lompat & Rintangan (Sulit)</option>
-                </select>
-            </div>
-            <div class="flex gap-2 justify-end">
-                <button onclick="document.getElementById('add-level-modal').classList.add('hidden')" class="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-200">Batal</button>
-                <button onclick="Admin.generateLevelWithAI()" class="bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow hover:bg-indigo-600 flex items-center gap-2"><i class="fas fa-robot"></i> Buat Level</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // ===================================================================
-        // KONFIGURASI APLIKASI UTAMA
-        // ===================================================================
-        // UBAH IS_PREVIEW KE false JIKA AKAN DI-DEPLOY KE BLOGGER
-        const IS_PREVIEW = false; 
-        
-        // PASTIKAN GAS_URL INI SUDAH DI-DEPLOY SEBAGAI 'ANYONE' / SIAPA SAJA
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzzKxlXP9JZjFuwTPkKvZL_J7q5mTLRmSPALOb5B3F77YU9icI_nuImkdHVrD0qrgnW/exec";
-        // ===================================================================
+        // === KONFIGURASI ===
+        const IS_PREVIEW_MODE = false; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz2a71lneTyKa4Jh4UlI8Nq0E5wpDWrlI1wZ9jUBzEHwcmAE8ohyLIBYHIP6LPRZE6U/exec";
 
-        // DATA LEVEL (Logic Master)
-        const LEVELS_DATA = [
-            { id: 1, title: "Langkah Pertama", icon: "fa-shoe-prints", category: "Urutan Berpikir", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:3, y:0}, obstacles: [], palette: ["FWD"], max: 10, minBlocks: 3, solution: [{t:"FWD"}, {t:"FWD"}, {t:"FWD"}], learn: "Dasar dari segalanya adalah maju satu persatu ke tujuan akhir." },
-            { id: 2, title: "Belok Kanan", icon: "fa-redo", category: "Urutan & Belokan", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:2, y:2}, obstacles: [], palette: ["FWD", "RIGHT"], max: 12, minBlocks: 5, solution: [{t:"FWD"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"},{t:"FWD"}], learn: "Robot memiliki arah wajah. Gunakan Belok Kanan untuk mengubah arah hadapnya sebesar 90 derajat." },
-            { id: 3, title: "Menghindar", icon: "fa-exclamation-triangle", category: "Logika Dasar", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:4, y:0}, obstacles: [[2,0], [2,1]], palette: ["FWD", "RIGHT", "LEFT"], max: 18, minBlocks: 11, solution: [{t:"RIGHT"},{t:"FWD"},{t:"FWD"},{t:"LEFT"},{t:"FWD"},{t:"FWD"},{t:"FWD"},{t:"FWD"},{t:"LEFT"},{t:"FWD"},{t:"FWD"}], learn: "Kombinasikan belok kanan dan kiri untuk menghindari blok rintangan." },
-            { id: 4, title: "Parkir Mundur", icon: "fa-car", category: "Orientasi", grid: [6,6], start: {x:2, y:2, dir:2}, goal: {x:0, y:0}, obstacles: [[1,1]], palette: ["FWD", "RIGHT", "LEFT"], max: 15, minBlocks: 6, solution: [{t:"RIGHT"},{t:"FWD"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"},{t:"FWD"}], learn: "Perhatikan titik awal robot dan kemana wajahnya menghadap di awal level!" },
-            { id: 5, title: "Lompatan Kodok", icon: "fa-frog", category: "Aksi Lompat", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:3, y:0}, obstacles: [[1,0]], palette: ["FWD", "JUMP"], max: 10, minBlocks: 2, solution: [{t:"JUMP"}, {t:"FWD"}], learn: "Terkadang rintangan tidak bisa dihindari, kita harus melompatinya. Blok Lompat maju sejauh 2 kotak!" },
-            { id: 6, title: "Jalan Pintas", icon: "fa-sync", category: "Perulangan (Looping)", grid: [6,6], start: {x:0, y:5, dir:1}, goal: {x:5, y:5}, obstacles: [], palette: ["FWD", "REPEAT_N"], max: 10, minBlocks: 1, solution: [{t:"REPEAT_N", n:5, action:"FWD"}], learn: "Gunakan Blok 'Ulangi' agar kodemu lebih efisien (lebih pendek tapi hasilnya maksimal)." },
-            { id: 7, title: "Naik Tangga", icon: "fa-stairs", category: "Perulangan Kompleks", grid: [6,6], start: {x:0, y:5, dir:1}, goal: {x:2, y:3}, obstacles: [[1,5], [2,4]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "REPEAT_N"], max: 10, minBlocks: 3, solution: [{t:"JUMP"},{t:"LEFT"},{t:"JUMP"}], learn: "Analisa pola! Pola yang berulang adalah kunci dari efisiensi kode." },
-            { id: 8, title: "Zig Zag", icon: "fa-bolt", category: "Kombinasi Pola", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:2, y:2}, obstacles: [], palette: ["FWD", "RIGHT", "LEFT", "REPEAT_N"], max: 15, minBlocks: 7, solution: [{t:"FWD"},{t:"RIGHT"},{t:"FWD"},{t:"LEFT"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"}], learn: "Buat robot bergerak serong dengan kombinasi maju dan belok secara bergantian." },
-            { id: 9, title: "Lompat Jauh", icon: "fa-rocket", category: "Loop & Lompat", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:4, y:0}, obstacles: [[1,0], [3,0]], palette: ["FWD", "JUMP", "REPEAT_N"], max: 10, minBlocks: 1, solution: [{t:"REPEAT_N", n:2, action:"JUMP"}], learn: "Blok di dalam Blok! Kamu bisa meletakkan blok lompat di dalam sebuah perulangan." },
-            { id: 10, title: "Labirin Kecil", icon: "fa-puzzle-piece", category: "Ujian Menengah", grid: [6,6], start: {x:0, y:0, dir:2}, goal: {x:5, y:5}, obstacles: [[1,4],[2,4],[3,4],[4,4],[1,3],[2,3],[3,3],[4,3]], palette: ["FWD", "LEFT", "RIGHT", "REPEAT_N"], max: 18, minBlocks: 3, solution: [{t:"REPEAT_N", n:5, action:"FWD"}, {t:"LEFT"}, {t:"REPEAT_N", n:5, action:"FWD"}], learn: "Ujian tengah untuk menggabungkan perulangan dan belokan di tempat yang tepat." },
-            { id: 11, title: "Pilih Jalan", icon: "fa-code-branch", category: "Pengkondisian Dasar", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:5, y:0}, obstacles: [[2,0]], palette: ["FWD", "JUMP", "IF"], max: 12, minBlocks: 4, solution: [{t:"FWD"}, {t:"IF", action:"JUMP"}, {t:"FWD"}, {t:"FWD"}], learn: "Mengenal 'JIKA' (IF). Perintah di dalamnya hanya akan dieksekusi JIKA ada rintangan buntu di depan robot." },
-            { id: 12, title: "Batu Beruntun", icon: "fa-cubes", category: "Logika Kondisi", grid: [6,6], start: {x:0, y:2, dir:1}, goal: {x:5, y:2}, obstacles: [[2,2],[4,2]], palette: ["FWD", "JUMP", "REPEAT_N"], max: 12, minBlocks: 2, solution: [{t:"FWD"},{t:"REPEAT_N", n:2, action:"JUMP"}], learn: "Gunakan looping untuk mengeksekusi kondisi rintangan beruntun." },
-            { id: 13, title: "Putaran", icon: "fa-undo", category: "Orientasi Lanjut", grid: [6,6], start: {x:3, y:3, dir:0}, goal: {x:2, y:2}, obstacles: [[3,2]], palette: ["FWD", "LEFT", "RIGHT"], max: 12, minBlocks: 4, solution: [{t:"LEFT"},{t:"FWD"},{t:"RIGHT"},{t:"FWD"}], learn: "Sadar orientasi sangat penting agar robot tidak menabrak batas map." },
-            { id: 14, title: "Jebakan", icon: "fa-skull", category: "Menghindar Kompleks", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:4, y:4}, obstacles: [[1,0], [2,1], [3,2], [4,3]], palette: ["FWD", "RIGHT", "LEFT", "JUMP"], max: 18, minBlocks: 7, solution: [{t:"JUMP"},{t:"RIGHT"},{t:"JUMP"},{t:"LEFT"},{t:"JUMP"},{t:"RIGHT"},{t:"JUMP"}], learn: "Hati-hati dengan jebakan beruntun, melompat ber-zig-zag adalah solusinya." },
-            { id: 15, title: "Lorong Buntu", icon: "fa-archway", category: "Gabungan", grid: [6,6], start: {x:0, y:2, dir:1}, goal: {x:5, y:2}, obstacles: [[0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[0,3],[1,3],[2,3],[3,3],[4,3],[5,3]], palette: ["FWD", "REPEAT_N"], max: 10, minBlocks: 1, solution: [{t:"REPEAT_N", n:5, action:"FWD"}], learn: "Jalan lurus sempit, jangan belok atau kamu akan gagal." },
-            { id: 16, title: "Bercabang", icon: "fa-code-fork", category: "Pengkondisian Lanjut", grid: [6,6], start: {x:0, y:0, dir:2}, goal: {x:2, y:0}, obstacles: [[0,1]], palette: ["FWD", "RIGHT", "LEFT", "JUMP", "IF_ELSE"], max: 12, minBlocks: 3, solution: [{t:"IF_ELSE"},{t:"FWD"},{t:"FWD"}], learn: "Blok 'JIKA Buntu-ELSE' akan memilih salah satu jalan berdasarkan situasi. Kiri bila buntu, kanan bila tidak." },
-            { id: 17, title: "Tarian Robot", icon: "fa-music", category: "Perulangan Unik", grid: [6,6], start: {x:2, y:2, dir:1}, goal: {x:2, y:2}, obstacles: [], palette: ["FWD", "RIGHT", "LEFT", "REPEAT_N"], max: 15, minBlocks: 1, solution: [{t:"REPEAT_N", n:4, action:"RIGHT"}], learn: "Kembali ke titik dan arah awal dengan kombinasi perputaran." },
-            { id: 18, title: "Penyusup", icon: "fa-user-secret", category: "Penyusupan", grid: [6,6], start: {x:0, y:5, dir:1}, goal: {x:5, y:0}, obstacles: [[1,4],[2,4],[3,4],[4,4],[1,3],[2,3],[3,3],[4,3]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "REPEAT_N"], max: 20, minBlocks: 3, solution: [{t:"REPEAT_N", n:5, action:"FWD"}, {t:"LEFT"}, {t:"REPEAT_N", n:5, action:"FWD"}], learn: "Misi menyusup diam-diam di antara deretan rintangan yang tebal." },
-            { id: 19, title: "Master Logika", icon: "fa-brain", category: "Ujian Berat", grid: [6,6], start: {x:0, y:0, dir:2}, goal: {x:4, y:5}, obstacles: [[1,1],[3,3]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "IF_ELSE", "REPEAT_N"], max: 25, minBlocks: 6, solution: [{t:"FWD"},{t:"FWD"},{t:"LEFT"},{t:"REPEAT_N", n:4, action:"FWD"},{t:"RIGHT"},{t:"REPEAT_N", n:3, action:"FWD"}], learn: "Uji seberapa efisien kodemu dengan batasan blok yang mulai ketat." },
-            { id: 20, title: "Ujian Akhir", icon: "fa-graduation-cap", category: "Ujian Akhir", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:5, y:5}, obstacles: [[1,2], [2,2], [3,2]], palette: ["FWD", "LEFT", "RIGHT", "JUMP", "REPEAT_N"], max: 30, minBlocks: 3, solution: [{t:"REPEAT_N", n:5, action:"FWD"}, {t:"RIGHT"}, {t:"REPEAT_N", n:5, action:"FWD"}], learn: "Tantangan terakhir sebelum menjadi master ANDHALGO. Buktikan logikamu!" }
+        // Global State
+        const state = {
+            currentUser: null,
+            currentView: 'home',
+            userProgress: { levelTerbuka: 1, skorTotal: 0, levels: {} },
+            activeLevel: 1
+        };
+
+        const mockDB = {
+            users: [
+                { username: 'admin', password: 'password', role: 'admin', nama_lengkap: 'Guru Pengampu' },
+                { username: '12345', password: 'password', role: 'student', nama_lengkap: 'Budi Santoso', kelas: 'X PPLG 1' }
+            ],
+            progress: {
+                '12345': { level_terbuka: 2, skor_total: 100, levels: { '1': 100 } }
+            }
+        };
+
+        const MASTER_LEVELS = [
+            {
+                id: 1,
+                title: "Salam Dunia (Output)",
+                desc: "Dalam pemrograman, hal pertama yang biasa dilakukan adalah membuat komputer menyapa kita. Buatlah program yang mencetak teks <b>'Halo Dunia!'</b> ke layar (Terminal).",
+                hint: "Gunakan blok 'Cetak Teks'. Ketik persis: Halo Dunia!",
+                availableBlocks: [
+                    { type: 'print', text: 'Cetak Teks [ ... ]', template: 'console.log("{{VAL}}");', expectInput: true }
+                ],
+                validation: (outputLogs) => outputLogs.some(log => log === "Halo Dunia!"),
+                points: 100
+            },
+            {
+                id: 2,
+                title: "Matematika Dasar",
+                desc: "Komputer sangat pintar berhitung. Cetaklah <b>hasil penjumlahan</b> dari 15 dan 25 ke terminal.",
+                hint: "Gunakan blok Cetak Hasil Math, dan ketikkan rumusnya (misal: 15+25).",
+                availableBlocks: [
+                    { type: 'math', text: 'Cetak Hasil Math [ ... ]', template: 'console.log({{VAL}});', expectInput: true },
+                    { type: 'print', text: 'Cetak Teks [ ... ]', template: 'console.log("{{VAL}}");', expectInput: true }
+                ],
+                validation: (outputLogs) => outputLogs.some(log => log == 40 || log === "40"),
+                points: 150
+            },
+            {
+                id: 3,
+                title: "Logika Percabangan (IF)",
+                desc: "Sebuah program mendeteksi nilai ujian (N). Jika N > 75, maka cetak <b>'Lulus'</b>. <i>Nilai (N) saat ini adalah 80.</i>",
+                hint: "Urutan: Set Variabel N -> Cek Kondisi (Jika N > 75) -> Cetak 'Lulus'.",
+                availableBlocks: [
+                    { type: 'var', text: 'Set N = 80', template: 'let N = 80;' },
+                    { type: 'if', text: 'JIKA N > 75 LAKUKAN:', template: 'if(N > 75) {' },
+                    { type: 'print_tab', text: '  --> Cetak "Lulus"', template: '  console.log("Lulus");' },
+                    { type: 'end_if', text: 'AKHIRI JIKA', template: '}' }
+                ],
+                validation: (outputLogs, rawCode) => {
+                    const isPrinted = outputLogs.some(log => log === "Lulus");
+                    const hasLogic = rawCode.includes("if(N > 75)") && rawCode.includes("let N = 80");
+                    return isPrinted && hasLogic;
+                },
+                points: 200
+            }
         ];
 
-        const DummyDB = {
-            users: [
-                { id: "U01", username: "admin", password: "edudigital", role: "admin", nama_lengkap: "Guru Administrator", kelas: "-", tahun_pelajaran: "-" },
-                { id: "U02", username: "peserta", password: "edudigital", role: "peserta", nama_lengkap: "Siswa Penjelajah", kelas: "7A", tahun_pelajaran: "2025/2026" }
-            ],
-            progress: [ { username: "peserta", level_terbuka: 1, skor_total: 0, status: Array(50).fill(false) } ],
-            customLevels: []
-        };
-
-        const AppState = { user: null, progress: null, currentLevel: null, commands: [], isPlaying: false, helpLeft: 2, tempBlockConfig: null };
-
-        const Utils = {
-            showLoading: (msg = "Memproses...") => { document.getElementById('loading-text').innerText = msg; document.getElementById('loading-overlay').classList.remove('hidden'); document.getElementById('loading-overlay').classList.add('flex'); },
-            hideLoading: () => { document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex'); },
-            showToast: (msg, type = "success") => {
-                const container = document.getElementById('toast-container');
-                const t = document.createElement('div');
-                const color = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-                t.className = `${color} text-white px-5 py-3 rounded-xl shadow-xl fade-in flex items-center gap-3 text-sm font-bold`;
-                t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} text-lg"></i> <span>${msg}</span>`;
-                container.appendChild(t);
-                setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(-10px)'; t.style.transition = 'all 0.3s'; setTimeout(()=>t.remove(), 300); }, 3000);
-            }
-        };
-
-        const UI = {
-            views: ['landing', 'login', 'register', 'peserta', 'admin'],
-            showView: (viewId) => { 
-                UI.views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden')); 
-                const tgt = document.getElementById(`view-${viewId}`);
-                tgt.classList.remove('hidden'); 
-                if(viewId !== 'peserta') tgt.classList.add('flex'); 
-                
-                // Toggle Header Menus
-                const isLoggedIn = AppState.user !== null;
-                document.getElementById('guest-menu').classList.toggle('hidden', isLoggedIn);
-                document.getElementById('user-menu').classList.toggle('hidden', !isLoggedIn);
-            },
-            showStudentMap: () => { document.getElementById('peserta-game').classList.add('hidden'); document.getElementById('peserta-map').classList.remove('hidden'); StudentUI.renderMap(); }
-        };
-
-        const Auth = {
-            login: async (e) => {
-                e.preventDefault(); 
-                const u = document.getElementById('login-user').value; 
-                const p = document.getElementById('login-pass').value;
-                Utils.showLoading("Mencocokkan Data...");
-                
-                try {
-                    let res;
-                    if (IS_PREVIEW) { 
-                        await new Promise(r => setTimeout(r, 600)); 
-                        const user = DummyDB.users.find(x => String(x.username) === String(u) && String(x.password) === String(p)); 
-                        if (user) { 
-                            const prog = DummyDB.progress.find(x => String(x.username) === String(u)) || { username: u, level_terbuka: 1, skor_total: 0, status: Array(50).fill(false) }; 
-                            res = { status: 'success', user: user, progress: prog }; 
-                        } else res = { status: 'error', message: 'Username/Password salah' }; 
-                    } else { 
-                        const fetchRes = await fetch(GAS_URL, { method: 'POST', body: new URLSearchParams({ action: 'login', username: u, password: p }) }); 
-                        if(!fetchRes.ok) throw new Error("Gagal mengambil response");
-                        res = await fetchRes.json(); 
-                    }
-                    
-                    Utils.hideLoading();
-                    if (res.status === 'success') {
-                        AppState.user = res.user; AppState.progress = res.progress;
-                        document.getElementById('user-name').innerText = res.user.nama_lengkap;
-                        document.getElementById('user-role-badge').innerText = res.user.role.toUpperCase();
-                        if (res.user.role === 'admin') { UI.showView('admin'); Admin.loadData(); } 
-                        else { UI.showView('peserta'); UI.showStudentMap(); AppState.helpLeft = 2; }
-                    } else { Utils.showToast(res.message, "error"); }
-                } catch (err) { Utils.hideLoading(); console.error(err); Utils.showToast("Gagal terhubung ke Server.", "error"); }
-            },
-
-            register: async (e) => {
-                e.preventDefault();
-                const u = document.getElementById('reg-user').value;
-                const p = document.getElementById('reg-pass').value;
-                const n = document.getElementById('reg-nama').value;
-                const k = document.getElementById('reg-kelas').value;
-                const t = document.getElementById('reg-tahun').value;
-
-                Utils.showLoading("Mendaftarkan Akun...");
-                try {
-                    let res;
-                    if(IS_PREVIEW) {
-                        await new Promise(r => setTimeout(r, 600));
-                        if(DummyDB.users.some(x => x.username === u)) {
-                            res = { status: 'error', message: 'Username (NISN) sudah terdaftar!' };
-                        } else {
-                            const newU = { id: "U"+Date.now(), username: u, password: p, role: "peserta", nama_lengkap: n, kelas: k, tahun_pelajaran: t };
-                            const newP = { username: u, level_terbuka: 1, skor_total: 0, status: Array(50).fill(false) };
-                            DummyDB.users.push(newU); DummyDB.progress.push(newP);
-                            res = { status: 'success', user: newU, progress: newP };
-                        }
-                    } else {
-                        const fetchRes = await fetch(GAS_URL, { method: 'POST', body: new URLSearchParams({ action: 'register', username: u, password: p, nama: n, kelas: k, tahun_pelajaran: t }) });
-                        res = await fetchRes.json();
-                    }
-
-                    Utils.hideLoading();
-                    if(res.status === 'success') {
-                        Utils.showToast("Pendaftaran Berhasil! Memasukkan Anda...");
-                        AppState.user = res.user; AppState.progress = res.progress;
-                        document.getElementById('user-name').innerText = res.user.nama_lengkap;
-                        document.getElementById('user-role-badge').innerText = "PESERTA";
-                        UI.showView('peserta'); UI.showStudentMap(); AppState.helpLeft = 2;
-                    } else { Utils.showToast(res.message, "error"); }
-                } catch(err) { Utils.hideLoading(); Utils.showToast("Terjadi kesalahan server.", "error"); }
-            },
-
-            logout: () => { AppState.user = null; AppState.progress = null; document.getElementById('login-form').reset(); document.getElementById('register-form').reset(); UI.showView('landing'); }
-        };
-
-        const StudentUI = {
-            renderMap: () => {
-                const grid = document.getElementById('level-grid'); grid.innerHTML = '';
-                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
-                document.getElementById('student-score-display').innerText = AppState.progress.skor_total;
-                
-                allLevels.forEach((lvl, index) => {
-                    const isOpen = (index + 1) <= AppState.progress.level_terbuka;
-                    const isDone = AppState.progress.status[index];
-                    const bg = isDone ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-400' : (isOpen ? 'bg-white border-indigo-200 hover:border-primary hover:shadow-lg cursor-pointer transform hover:-translate-y-1' : 'bg-gray-100 border-gray-200 opacity-60');
-                    const iconColor = isDone ? 'text-green-500' : (isOpen ? 'text-primary' : 'text-gray-400');
-                    const iconType = isDone ? 'fa-check-circle' : (isOpen ? lvl.icon : 'fa-lock');
-                    
-                    const el = document.createElement('div');
-                    el.className = `p-5 rounded-3xl border-2 transition-all duration-200 text-center flex flex-col items-center justify-center shadow-sm relative overflow-hidden ${bg}`;
-                    if(isDone) el.innerHTML += `<div class="absolute top-0 right-0 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">Selesai</div>`;
-                    if (isOpen) el.onclick = () => Game.showLevelInfo(lvl.id);
-                    
-                    el.innerHTML += `<div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-3xl mb-3 shadow-sm border border-gray-100 ${iconColor}"><i class="fas ${iconType}"></i></div><h4 class="font-bold text-dark text-sm leading-tight mb-1">${lvl.id}. ${lvl.title}</h4><p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${lvl.category}</p>`;
-                    grid.appendChild(el);
-                });
-            },
-            
-            draggedIdx: null,
-            allowDrop: (e) => e.preventDefault(),
-            dragStart: (e, idx) => { StudentUI.draggedIdx = idx; e.target.classList.add('dragging'); },
-            dragEnd: (e) => e.target.classList.remove('dragging'),
-            drop: (e) => {
-                e.preventDefault();
-                const targetWrap = e.target.closest('.cmd-wrap');
-                if(targetWrap && StudentUI.draggedIdx !== null) {
-                    const dropIdx = parseInt(targetWrap.dataset.idx);
-                    const item = AppState.commands.splice(StudentUI.draggedIdx, 1)[0];
-                    AppState.commands.splice(dropIdx, 0, item);
-                    StudentUI.renderCommands();
+        const app = {
+            init: () => {
+                if(IS_PREVIEW_MODE) {
+                    document.getElementById('demo-mode-badge-login').classList.remove('hidden');
+                    document.getElementById('demo-mode-badge-reg').classList.remove('hidden');
                 }
-                StudentUI.draggedIdx = null;
-            },
-
-            renderCommands: () => {
-                const list = document.getElementById('commands-list'); list.innerHTML = '';
-                const limitText = document.getElementById('block-limit-text');
-                limitText.innerText = `${AppState.commands.length} / Maks ${AppState.currentLevel.max} Blok`;
-                limitText.className = AppState.commands.length > AppState.currentLevel.max ? "text-xs font-bold px-2 py-1 bg-red-100 border-red-200 text-red-600 rounded shadow-sm" : "text-xs font-bold px-2 py-1 bg-white border border-gray-200 text-secondary rounded shadow-sm";
-
-                if(AppState.commands.length === 0) { list.innerHTML = '<div class="text-center text-gray-400 text-sm mt-8 border-2 border-dashed border-gray-300 rounded-2xl p-6 bg-white"><i class="fas fa-hand-pointer block text-3xl mb-3 text-gray-300"></i> Area masih kosong.<br>Klik atau tarik blok dari atas ke sini!</div>'; return; }
-                
-                AppState.commands.forEach((cmd, i) => {
-                    let label = ""; let color = ""; let icon = "";
-                    if(cmd.t === "FWD") { label = "Maju (1 Kotak)"; color = "bg-blue-50 text-blue-700 border-blue-200 border-l-4 border-l-blue-500"; icon = "fa-arrow-up"; }
-                    else if(cmd.t === "RIGHT") { label = "Putar Kanan"; color = "bg-purple-50 text-purple-700 border-purple-200 border-l-4 border-l-purple-500"; icon = "fa-redo"; }
-                    else if(cmd.t === "LEFT") { label = "Putar Kiri"; color = "bg-pink-50 text-pink-700 border-pink-200 border-l-4 border-l-pink-500"; icon = "fa-undo"; }
-                    else if(cmd.t === "JUMP") { label = "Lompat"; color = "bg-green-50 text-green-700 border-green-200 border-l-4 border-l-green-500"; icon = "fa-frog"; }
-                    else if(cmd.t === "REPEAT_N") { label = `Ulangi ${cmd.n}x: ${cmd.action}`; color = "bg-yellow-50 text-yellow-800 border-yellow-300 border-l-4 border-l-yellow-500"; icon = "fa-sync"; }
-                    else if(cmd.t === "IF") { label = `JIKA Buntu: ${cmd.action}`; color = "bg-orange-50 text-orange-800 border-orange-300 border-l-4 border-l-orange-500"; icon = "fa-code-branch"; }
-                    else if(cmd.t === "IF_ELSE") { label = `JIKA Buntu: Kiri, BILA TIDAK: Kanan`; color = "bg-red-50 text-red-800 border-red-300 border-l-4 border-l-red-500"; icon = "fa-random"; }
-
-                    const el = document.createElement('div');
-                    el.className = `cmd-wrap flex items-center justify-between p-3 rounded-lg border shadow-sm cmd-block font-bold text-sm bg-white hover:bg-gray-50 ${color}`;
-                    el.id = `cmd-${i}`; el.dataset.idx = i; el.draggable = true;
-                    el.ondragstart = (e) => StudentUI.dragStart(e, i);
-                    el.ondragend = (e) => StudentUI.dragEnd(e);
-                    
-                    el.innerHTML = `<div class="flex items-center gap-3"><i class="fas fa-grip-lines text-gray-400 cursor-grab px-1 hover:text-gray-600"></i> <span><i class="fas ${icon} mr-2 opacity-70"></i> ${label}</span></div><button onclick="Game.removeCommand(${i})" class="text-gray-300 hover:text-red-500 hover:bg-red-50 w-8 h-8 rounded flex items-center justify-center transition"><i class="fas fa-times"></i></button>`;
-                    list.appendChild(el);
-                });
-            },
-
-            showConfigModal: (type) => {
-                AppState.tempBlockConfig = type;
-                document.getElementById('config-n-container').style.display = (type === 'REPEAT_N') ? 'block' : 'none';
-                document.getElementById('config-title').innerHTML = (type === 'REPEAT_N') ? '<i class="fas fa-sync text-yellow-500"></i> Blok Perulangan' : '<i class="fas fa-code-branch text-orange-500"></i> Blok Kondisi (JIKA)';
-                document.getElementById('config-modal').classList.remove('hidden');
-            },
-
-            saveConfigBlock: () => {
-                const type = AppState.tempBlockConfig;
-                const n = parseInt(document.getElementById('config-n-input').value) || 1;
-                const action = document.getElementById('config-action-input').value;
-                document.getElementById('config-modal').classList.add('hidden');
-                
-                if (AppState.commands.length >= AppState.currentLevel.max) { Utils.showToast("Batas maksimal blok tercapai!", "error"); return; }
-                if(type === 'REPEAT_N') AppState.commands.push({ t: "REPEAT_N", n: n, action: action });
-                else if(type === 'IF') AppState.commands.push({ t: "IF", action: action });
-                
-                StudentUI.renderCommands();
-            }
-        };
-
-        const Game = {
-            showLevelInfo: (levelId) => {
-                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
-                const lvl = allLevels.find(l => l.id === levelId);
-                if (!lvl) return;
-                
-                if(levelId > AppState.progress.level_terbuka && levelId <= 20) { Utils.showToast("Level ini masih terkunci! Selesaikan urutan sebelumnya.", "error"); return; }
-
-                document.getElementById('info-lvl-title').innerText = `Level ${lvl.id}: ${lvl.title}`;
-                document.getElementById('info-lvl-cat').innerText = lvl.category;
-                document.getElementById('info-lvl-icon').innerHTML = `<i class="fas ${lvl.icon}"></i>`;
-                document.getElementById('info-lvl-desc').innerText = lvl.learn || "Gunakan susunan blok kode secara efisien untuk menyelesaikan rintangan dalam level ini.";
-                
-                document.getElementById('btn-start-lvl').onclick = () => {
-                    document.getElementById('level-info-modal').classList.add('hidden');
-                    Game.start(levelId);
-                };
-                
-                document.getElementById('level-info-modal').classList.remove('hidden');
-            },
-
-            start: (levelId) => {
-                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
-                AppState.currentLevel = allLevels.find(l => l.id === levelId);
-                
-                document.getElementById('peserta-map').classList.add('hidden');
-                document.getElementById('peserta-game').classList.remove('hidden');
-                document.getElementById('game-title').innerText = `Tantangan ${AppState.currentLevel.id}: ${AppState.currentLevel.title}`;
-                document.getElementById('game-instruction').innerText = "Pandu robot ke arah bintang (Maks " + AppState.currentLevel.max + " Blok)";
-                document.getElementById('help-count').innerText = AppState.helpLeft;
-                
-                AppState.commands = []; StudentUI.renderCommands();
-                GameEngine.initGrid(); GameEngine.draw();
-                
-                const pal = document.getElementById('block-palette'); pal.innerHTML = '';
-                const pData = [
-                    { t:"FWD", l:"Maju", c:"bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200", i:"fa-arrow-up" }, { t:"RIGHT", l:"Kanan", c:"bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200", i:"fa-redo" },
-                    { t:"LEFT", l:"Kiri", c:"bg-pink-100 text-pink-700 hover:bg-pink-200 border border-pink-200", i:"fa-undo" }, { t:"JUMP", l:"Lompat", c:"bg-green-100 text-green-700 hover:bg-green-200 border border-green-200", i:"fa-frog" },
-                    { t:"REPEAT_N", l:"Ulangi", c:"bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-300", i:"fa-sync", smart:true },
-                    { t:"IF", l:"Jika Buntu", c:"bg-orange-100 text-orange-800 hover:bg-orange-200 border border-orange-300", i:"fa-code-branch", smart:true },
-                    { t:"IF_ELSE", l:"Jika-Else", c:"bg-red-100 text-red-800 hover:bg-red-200 border border-red-300", i:"fa-random", smart:true }
-                ];
-                AppState.currentLevel.palette.forEach(pt => {
-                    const d = pData.find(x=>x.t===pt); if(d) {
-                        const btn = document.createElement('button');
-                        btn.className = `${d.c} px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition transform active:scale-95 flex items-center gap-1.5`;
-                        btn.innerHTML = `<i class="fas ${d.i}"></i> ${d.l}`;
-                        btn.onclick = () => { if(d.smart) StudentUI.showConfigModal(d.t); else Game.addCommand(d.t); };
-                        pal.appendChild(btn);
-                    }
-                });
-            },
-            addCommand: (t) => { if (AppState.commands.length >= AppState.currentLevel.max) { Utils.showToast("Batas maksimal blok tercapai!", "error"); return; } AppState.commands.push({ t: t }); StudentUI.renderCommands(); },
-            removeCommand: (idx) => { AppState.commands.splice(idx, 1); StudentUI.renderCommands(); },
-            resetCommands: () => { AppState.commands = []; StudentUI.renderCommands(); GameEngine.initGrid(); GameEngine.draw(); },
-            useHelp: () => {
-                if(AppState.helpLeft <= 0) { Utils.showToast("Kuota Bantuan Habis!", "error"); return; }
-                if(!AppState.currentLevel.solution || AppState.currentLevel.solution.length === 0) { Utils.showToast("Solusi bantuan belum tersedia.", "error"); return; }
-                AppState.helpLeft--; document.getElementById('help-count').innerText = AppState.helpLeft;
-                AppState.commands = JSON.parse(JSON.stringify(AppState.currentLevel.solution)); 
-                StudentUI.renderCommands(); Utils.showToast("Solusi ideal telah diterapkan otomatis ke skrip.");
-            },
-            run: async () => {
-                if(AppState.commands.length === 0) { Utils.showToast("Skrip program masih kosong!"); return; }
-                if(AppState.isPlaying) return; AppState.isPlaying = true;
-                
-                // Animasi scroll fokus layar ke area main (Game Container)
-                document.getElementById('peserta-game').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                GameEngine.initGrid(); GameEngine.draw();
-                const flattenedCmds = [];
-                for(let c of AppState.commands) {
-                    if(c.t === 'REPEAT_N') { for(let i=0; i<c.n; i++) flattenedCmds.push({t:c.action}); }
-                    else flattenedCmds.push(c);
-                }
-
-                let success = true;
-                for (let i = 0; i < flattenedCmds.length; i++) {
-                    const cmd = flattenedCmds[i];
-                    const realIdx = Math.min(i, AppState.commands.length-1);
-                    document.querySelectorAll('.cmd-block').forEach(el => el.classList.remove('running'));
-                    const uiCmd = document.getElementById(`cmd-${realIdx}`);
-                    if (uiCmd) { uiCmd.classList.add('running'); uiCmd.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-                    
-                    const res = await GameEngine.executeStep(cmd);
-                    if (!res) { success = false; break; }
-                }
-
-                document.querySelectorAll('.cmd-block').forEach(el => el.classList.remove('running'));
-                AppState.isPlaying = false;
-                
-                if (success && GameEngine.robot.x === AppState.currentLevel.goal.x && GameEngine.robot.y === AppState.currentLevel.goal.y) setTimeout(Game.win, 300);
-                else Utils.showToast("Gagal! Robot menabrak atau logika kurang pas.", "error");
-            },
-            win: async () => {
-                const used = AppState.commands.length;
-                const min = AppState.currentLevel.minBlocks;
-                const lvlId = AppState.currentLevel.id;
-                
-                let score = 100;
-                if(used > min) score -= (used - min) * 10;
-                if(score < 40) score = 40; 
-                
-                const isAlreadyBeaten = AppState.progress.status[lvlId - 1];
-
-                if (!isAlreadyBeaten) {
-                    AppState.progress.skor_total += score;
-                    AppState.progress.status[lvlId - 1] = true;
-                    if(lvlId >= AppState.progress.level_terbuka) {
-                        AppState.progress.level_terbuka = lvlId + 1;
-                    }
+                const savedSession = sessionStorage.getItem('andhalgo_session');
+                if (savedSession) {
+                    const sessionData = JSON.parse(savedSession);
+                    app.handleSuccessfulLogin(sessionData.user, sessionData.progress);
                 } else {
-                    score = 0; 
+                    app.navigate('home');
                 }
 
-                document.getElementById('level-score-earned').innerText = isAlreadyBeaten ? "+0 (Tuntas)" : `+${score}`;
-                document.getElementById('level-total-score').innerText = AppState.progress.skor_total;
-                document.getElementById('score-bar').style.width = isAlreadyBeaten ? '100%' : `${score}%`;
-                document.getElementById('score-note').innerText = isAlreadyBeaten ? "Latihan ulang selesai!" : (score === 100 ? "Sempurna! Sangat Efisien (Blok Minimum)!" : `Bisa lebih pendek! (Kamu: ${used}, Ideal: ${min} blok)`);
+                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.addEventListener('click', () => {
+                        const menu = document.getElementById('mobile-menu');
+                        if (menu) menu.classList.toggle('hidden');
+                    });
+                }
+            },
+
+            navigate: (viewId) => {
+                document.querySelectorAll('.view-section').forEach(el => {
+                    el.classList.remove('show');
+                    el.classList.add('hide');
+                    setTimeout(() => { 
+                        if(el.classList.contains('hide')) el.style.display = 'none'; 
+                    }, 300);
+                });
+
+                const targetView = document.getElementById(`view-${viewId}`);
+                if (targetView) {
+                    targetView.style.display = 'block'; 
+                    if(viewId === 'login' || viewId === 'register') targetView.style.display = 'flex';
+                    void targetView.offsetWidth; 
+                    targetView.classList.remove('hide');
+                    targetView.classList.add('show');
+                }
+
+                state.currentView = viewId;
+                app.updateNavbar();
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu) mobileMenu.classList.add('hidden');
+            },
+
+            updateNavbar: () => {
+                const navActions = document.getElementById('nav-actions');
+                const mobileNav = document.getElementById('mobile-nav-items');
                 
-                document.getElementById('success-modal').classList.remove('hidden');
-                
-                if(!IS_PREVIEW && !isAlreadyBeaten) {
-                    try {
-                        fetch(GAS_URL, { 
-                            method: 'POST', 
-                            body: new URLSearchParams({ action: 'saveProgress', username: AppState.user.username, level: lvlId, score: score }) 
+                if (state.currentUser) {
+                    navActions.innerHTML = `
+                        <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full shadow-sm">
+                            <span class="text-sm font-bold text-gray-700 hidden md:block ml-2">${state.currentUser.nama_lengkap.split(' ')[0]}</span>
+                            <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold shadow-inner">
+                                ${state.currentUser.nama_lengkap.charAt(0).toUpperCase()}
+                            </div>
+                        </div>
+                    `;
+                    mobileNav.innerHTML = `
+                        <div class="px-4 py-2 text-sm font-bold text-gray-500 uppercase tracking-wide border-b border-gray-100 mb-2">Akun: ${state.currentUser.nama_lengkap}</div>
+                        <a href="#" onclick="app.logout()" class="block px-4 py-3 rounded-xl text-base font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors">Keluar Aplikasi</a>
+                    `;
+                } else {
+                    navActions.innerHTML = `
+                        <button onclick="app.navigate('login')" class="text-gray-600 hover:text-indigo-600 font-bold px-4 py-2 rounded-xl transition-colors hidden sm:block">Masuk</button>
+                        <button onclick="app.navigate('register')" class="bg-indigo-600 text-white hover:bg-indigo-700 font-bold px-6 py-2.5 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 hidden sm:block">Daftar Akun</button>
+                        <button id="mobile-menu-btn-inner" class="sm:hidden text-gray-500 hover:text-indigo-600 focus:outline-none p-2 bg-gray-50 rounded-lg">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    `;
+                    mobileNav.innerHTML = `
+                        <a href="#" onclick="app.navigate('login')" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">Masuk</a>
+                        <a href="#" onclick="app.navigate('register')" class="block px-4 py-3 rounded-xl text-base font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Daftar Akun</a>
+                    `;
+                    const newBtn = document.getElementById('mobile-menu-btn-inner');
+                    if(newBtn) {
+                        newBtn.addEventListener('click', () => {
+                            const menu = document.getElementById('mobile-menu');
+                            if (menu) menu.classList.toggle('hidden');
                         });
-                    } catch(e) { console.error("Save Progress Error:", e); }
-                }
-            },
-            backToMap: () => { document.getElementById('success-modal').classList.add('hidden'); UI.showStudentMap(); },
-            playNextLevel: () => {
-                document.getElementById('success-modal').classList.add('hidden');
-                const nextLvlId = AppState.currentLevel.id + 1;
-                const allLevels = [...LEVELS_DATA, ...DummyDB.customLevels];
-                const nextLevelData = allLevels.find(l => l.id === nextLvlId);
-
-                if (nextLevelData) Game.showLevelInfo(nextLvlId);
-                else { Utils.showToast("Selamat! Kamu telah menyelesaikan semua peta petualangan!", "success"); UI.showStudentMap(); }
-            }
-        };
-
-        const GameEngine = {
-            robot: {x:0, y:0, dir:1}, 
-            grid: [],
-            initGrid: () => {
-                GameEngine.robot = { ...AppState.currentLevel.start };
-                const w = AppState.currentLevel.grid[0]; const h = AppState.currentLevel.grid[1];
-                GameEngine.grid = Array(h).fill().map(() => Array(w).fill(0));
-                AppState.currentLevel.obstacles.forEach(o => { if(GameEngine.grid[o[1]] !== undefined) GameEngine.grid[o[1]][o[0]] = 1; });
-            },
-            draw: () => {
-                const c = document.getElementById('canvas-grid'); c.innerHTML = '';
-                const w = AppState.currentLevel.grid[0]; const h = AppState.currentLevel.grid[1];
-                const cw = 300 / w; const ch = 300 / h;
-                
-                for(let y=0; y<h; y++) {
-                    for(let x=0; x<w; x++) {
-                        const cell = document.createElement('div');
-                        cell.className = `absolute grid-cell border border-gray-200 ${GameEngine.grid[y][x] === 1 ? 'bg-gray-800 rounded-sm' : 'bg-white'}`;
-                        cell.style.width = `${cw}px`; cell.style.height = `${ch}px`; cell.style.left = `${x*cw}px`; cell.style.top = `${y*ch}px`;
-                        c.appendChild(cell);
                     }
                 }
-                const g = document.createElement('div');
-                g.className = 'absolute text-green-500 flex items-center justify-center text-3xl z-10';
-                g.style.width = `${cw}px`; g.style.height = `${ch}px`; g.style.left = `${AppState.currentLevel.goal.x*cw}px`; g.style.top = `${AppState.currentLevel.goal.y*ch}px`;
-                g.innerHTML = '<i class="fas fa-star drop-shadow-md animate-pulse"></i>';
-                c.appendChild(g);
-
-                const r = document.createElement('div');
-                r.id = 'robot-sprite';
-                r.className = 'absolute text-primary flex items-center justify-center text-3xl z-20 robot drop-shadow-lg bg-indigo-50 rounded-full border-4 border-primary';
-                r.style.width = `${cw*0.85}px`; r.style.height = `${ch*0.85}px`; 
-                r.style.left = `${GameEngine.robot.x*cw + cw*0.075}px`; r.style.top = `${GameEngine.robot.y*ch + ch*0.075}px`;
-                const rots = [0, 90, 180, 270]; r.style.transform = `rotate(${rots[GameEngine.robot.dir]}deg)`;
-                r.innerHTML = '<i class="fas fa-robot"></i>';
-                c.appendChild(r);
             },
-            executeStep: async (cmd) => {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        let tx = GameEngine.robot.x; let ty = GameEngine.robot.y;
-                        let valid = true;
-                        
-                        if(cmd.t === 'IF' || cmd.t === 'IF_ELSE') {
-                            let isBuntu = false;
-                            if(GameEngine.robot.dir===0 && ty-1<0) isBuntu=true; else if(GameEngine.robot.dir===0 && ty-1>=0 && GameEngine.grid[ty-1][tx]===1) isBuntu=true;
-                            if(GameEngine.robot.dir===1 && tx+1>=6) isBuntu=true; else if(GameEngine.robot.dir===1 && tx+1<6 && GameEngine.grid[ty][tx+1]===1) isBuntu=true;
-                            if(GameEngine.robot.dir===2 && ty+1>=6) isBuntu=true; else if(GameEngine.robot.dir===2 && ty+1<6 && GameEngine.grid[ty+1][tx]===1) isBuntu=true;
-                            if(GameEngine.robot.dir===3 && tx-1<0) isBuntu=true; else if(GameEngine.robot.dir===3 && tx-1>=0 && GameEngine.grid[ty][tx-1]===1) isBuntu=true;
 
-                            if(cmd.t === 'IF' && isBuntu) { cmd.t = cmd.action; }
-                            else if(cmd.t === 'IF_ELSE') { cmd.t = isBuntu ? 'LEFT' : 'RIGHT'; }
-                            else { cmd.t = 'NONE'; }
-                        }
-
-                        if(cmd.t === "FWD") {
-                            if(GameEngine.robot.dir === 0) ty -= 1; else if(GameEngine.robot.dir === 1) tx += 1; else if(GameEngine.robot.dir === 2) ty += 1; else if(GameEngine.robot.dir === 3) tx -= 1;
-                        } else if(cmd.t === "RIGHT") { GameEngine.robot.dir = (GameEngine.robot.dir + 1) % 4; }
-                        else if(cmd.t === "LEFT") { GameEngine.robot.dir = (GameEngine.robot.dir + 3) % 4; }
-                        else if(cmd.t === "JUMP") {
-                            if(GameEngine.robot.dir === 0) ty -= 2; else if(GameEngine.robot.dir === 1) tx += 2; else if(GameEngine.robot.dir === 2) ty += 2; else if(GameEngine.robot.dir === 3) tx -= 2;
-                        }
-
-                        if(tx < 0 || tx >= 6 || ty < 0 || ty >= 6 || (cmd.t !== 'JUMP' && GameEngine.grid[ty][tx] === 1)) valid = false;
-                        if(cmd.t === 'JUMP' && valid && GameEngine.grid[ty][tx] === 1) valid = false; 
-                        
-                        if(valid) { GameEngine.robot.x = tx; GameEngine.robot.y = ty; GameEngine.draw(); resolve(true); }
-                        else resolve(false);
-                    }, 500);
-                });
-            }
-        };
-
-        const Admin = {
-            currentData: [], filteredData: [], currentSort: null, tempDeleteUser: null,
-            loadData: async () => {
-                const tbody = document.getElementById('admin-table-body'); tbody.innerHTML = '<tr><td colspan="7" class="text-center p-8"><i class="fas fa-circle-notch fa-spin text-primary text-3xl"></i><p class="mt-3 text-gray-500 font-medium">Sinkronisasi data...</p></td></tr>';
+            fetchGAS: async (action, payload) => {
+                app.showLoader(true);
                 try {
-                    let allData = [];
-                    if(IS_PREVIEW) {
-                        const peserta = DummyDB.users.filter(u => u.role === 'peserta');
-                        allData = peserta.map(u => { const p = DummyDB.progress.find(x => String(x.username) === String(u.username)); return { username: u.username, nama: u.nama_lengkap, kelas: u.kelas || '-', tahun_pelajaran: u.tahun_pelajaran || '-', level: p ? p.level_terbuka : 1, skor: p ? p.skor_total : 0, status: p ? p.status : Array(50).fill(false) }; });
-                    } else { const res = await fetch(`${GAS_URL}?action=getAdminData`); const data = await res.json(); allData = data.students; }
-                    Admin.currentData = allData; Admin.populateFilters(); Admin.applyFilter();
-                } catch (e) { tbody.innerHTML = '<tr><td colspan="7" class="text-center p-8 text-danger"><i class="fas fa-wifi mb-2 text-2xl block"></i> Gagal koneksi ke database.</td></tr>'; }
-            },
-            populateFilters: () => {
-                const fTahun = document.getElementById('filter-tahun'); const fKelas = document.getElementById('filter-kelas');
-                const tVal = fTahun.value; const kVal = fKelas.value;
-                const uTahun = [...new Set(Admin.currentData.map(d => d.tahun_pelajaran))].sort();
-                const uKelas = [...new Set(Admin.currentData.map(d => d.kelas))].sort();
-                fTahun.innerHTML = '<option value="">Semua Tahun</option>'; uTahun.forEach(t => { if(t!=='-') fTahun.innerHTML += `<option value="${t}">${t}</option>`; }); fTahun.value = tVal;
-                fKelas.innerHTML = '<option value="">Semua Kelas</option>'; uKelas.forEach(k => { if(k!=='-') fKelas.innerHTML += `<option value="${k}">${k}</option>`; }); fKelas.value = kVal;
-            },
-            sortBy: (key) => { Admin.currentSort = key; Admin.applyFilter(); Utils.showToast(`Diurutkan dari ${key === 'skor' ? 'Skor' : 'Level'} Tertinggi`, "success"); },
-            applyFilter: () => {
-                const t = document.getElementById('filter-tahun').value; const k = document.getElementById('filter-kelas').value;
-                const s = document.getElementById('filter-search').value.toLowerCase();
-                
-                Admin.filteredData = Admin.currentData.filter(d => 
-                    (t===""||d.tahun_pelajaran===t) && 
-                    (k===""||d.kelas===k) &&
-                    (s===""||d.nama.toLowerCase().includes(s) || d.username.toLowerCase().includes(s))
-                );
-                if (Admin.currentSort) { Admin.filteredData.sort((a, b) => b[Admin.currentSort] - a[Admin.currentSort]); }
-                Admin.renderTable();
-            },
-            renderTable: () => {
-                const tbody = document.getElementById('admin-table-body');
-                document.getElementById('admin-stat-siswa').innerText = Admin.filteredData.length; 
-                document.getElementById('admin-stat-level').innerText = Admin.filteredData.length > 0 ? Math.max(...Admin.filteredData.map(d=>d.level)) : 0; 
-                document.getElementById('admin-stat-skor').innerText = Admin.filteredData.length > 0 ? Math.max(...Admin.filteredData.map(d=>d.skor)) : 0;
-                tbody.innerHTML = '';
-                if(Admin.filteredData.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center p-8 text-gray-400 font-bold"><i class="fas fa-folder-open text-3xl mb-3 block opacity-50"></i> Data kosong atau tidak ditemukan.</td></tr>'; return; }
-                
-                Admin.filteredData.forEach(d => {
-                    let statusHtml = '<div class="flex gap-0.5 justify-center">';
-                    for(let i=0; i<20; i++) { const c = d.status[i] ? 'bg-success shadow-[0_0_2px_rgba(16,185,129,0.5)]' : 'bg-gray-200'; statusHtml += `<div class="w-2.5 h-3 ${c} rounded-[2px]"></div>`; }
-                    statusHtml += '</div>';
-                    tbody.innerHTML += `<tr class="border-b hover:bg-gray-50 transition">
-                        <td class="p-4"><p class="font-bold text-dark">${d.nama}</p><p class="text-xs font-mono text-gray-500">${d.username}</p></td>
-                        <td class="p-4 text-center font-bold text-gray-600">${d.kelas}</td>
-                        <td class="p-4 text-center text-sm">${d.tahun_pelajaran}</td>
-                        <td class="p-4 text-center"><span class="bg-indigo-100 text-primary border border-indigo-200 px-3 py-1 rounded-lg text-xs font-bold shadow-sm">${d.level}</span></td>
-                        <td class="p-4 text-right font-black text-secondary text-lg">${d.skor}</td>
-                        <td class="p-4 text-center">${statusHtml}</td>
-                        <td class="p-4 text-center">
-                            <button onclick="Admin.resetProgress('${d.username}')" class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition" title="Reset Progres"><i class="fas fa-history"></i></button>
-                            <button onclick="Admin.confirmDelete('${d.username}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition ml-1" title="Hapus Siswa"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-                });
-            },
-            
-            // Delete Functionality with Modal
-            confirmDelete: (username) => {
-                Admin.tempDeleteUser = username;
-                document.getElementById('delete-modal').classList.remove('hidden');
-                document.getElementById('btn-confirm-delete').onclick = () => {
-                    document.getElementById('delete-modal').classList.add('hidden');
-                    Admin.executeDelete();
-                };
-            },
-            executeDelete: async () => {
-                if(!Admin.tempDeleteUser) return;
-                const un = Admin.tempDeleteUser;
-                Utils.showLoading("Menghapus data...");
-                if(IS_PREVIEW) { 
-                    await new Promise(r=>setTimeout(r,500)); 
-                    DummyDB.users = DummyDB.users.filter(x => x.username !== un);
-                    DummyDB.progress = DummyDB.progress.filter(x => x.username !== un);
-                } else { 
-                    try { await fetch(GAS_URL, { method:'POST', body:new URLSearchParams({action:'deleteStudent', username:un}) }); } catch(err){} 
-                }
-                Utils.hideLoading(); Utils.showToast("Data siswa berhasil dihapus!", "success"); Admin.loadData();
-            },
-
-            showAddStudentModal: () => { document.getElementById('form-add-student').reset(); document.getElementById('add-student-modal').classList.remove('hidden'); },
-            submitAddStudent: async (e) => {
-                e.preventDefault(); const u=document.getElementById('add-s-user').value; const p=document.getElementById('add-s-pass').value; const n=document.getElementById('add-s-nama').value; const k=document.getElementById('add-s-kelas').value; const t=document.getElementById('add-s-tahun').value;
-                document.getElementById('add-student-modal').classList.add('hidden'); Utils.showLoading();
-                if(IS_PREVIEW) { await new Promise(r=>setTimeout(r,800)); DummyDB.users.push({id:"U"+Date.now(), username:u, password:p, role:"peserta", nama_lengkap:n, kelas:k, tahun_pelajaran:t}); DummyDB.progress.push({username:u, level_terbuka:1, skor_total:0, status:Array(50).fill(false)}); }
-                else { try { await fetch(GAS_URL, { method:'POST', body:new URLSearchParams({action:'addStudent', username:u, password:p, nama:n, kelas:k, tahun_pelajaran:t}) }); } catch(err){} }
-                Utils.hideLoading(); Utils.showToast("Akun Berhasil Ditambahkan!"); Admin.loadData();
-            },
-            showUploadModal: () => { document.getElementById('file-upload-excel').value=''; document.getElementById('upload-student-modal').classList.remove('hidden'); },
-            downloadTemplate: () => {
-                const ws = XLSX.utils.json_to_sheet([ { "Username": "0123456789", "Password": "edudigital", "Nama Lengkap": "Ahmad", "Kelas": "7A", "Tahun Pelajaran": "2025/2026" } ]);
-                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Siswa"); XLSX.writeFile(wb, "Template_Siswa.xlsx");
-            },
-            handleUploadExcel: () => {
-                const f = document.getElementById('file-upload-excel'); if(!f.files.length) return Utils.showToast("Pilih file excel terlebih dahulu!", "error");
-                const r = new FileReader();
-                r.onload = async (e) => {
-                    const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
-                    const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false });
-                    
-                    const students = json.map(row => ({ 
-                        username: String(row['Username']||row['username']||'').trim(), 
-                        password: String(row['Password']||row['password']||'').trim(), 
-                        nama: row['Nama Lengkap']||row['nama'], 
-                        kelas: row['Kelas']||'-', 
-                        tahun_pelajaran: row['Tahun Pelajaran']||'-' 
-                    })).filter(s => s.username && s.nama);
-                    
-                    if(!students.length) return Utils.showToast("Format kosong / tidak sesuai", "error");
-                    document.getElementById('upload-student-modal').classList.add('hidden'); Utils.showLoading("Sinkronisasi massal...");
-                    
-                    if(IS_PREVIEW) { 
-                        await new Promise(r=>setTimeout(r,1000)); 
-                        students.forEach(s=>{ 
-                            DummyDB.users.push({id:"U"+Date.now(), username:s.username, password:s.password, role:"peserta", nama_lengkap:s.nama, kelas:s.kelas, tahun_pelajaran:s.tahun_pelajaran}); 
-                            DummyDB.progress.push({username:s.username, level_terbuka:1, skor_total:0, status:Array(50).fill(false)}); 
-                        }); 
-                    } else { 
-                        try { await fetch(GAS_URL, { method:'POST', body:new URLSearchParams({action:'uploadStudents', data:JSON.stringify(students)}) }); } catch(err){} 
+                    if (IS_PREVIEW_MODE) {
+                        await new Promise(r => setTimeout(r, 800));
+                        return app.simulateBackend(action, payload);
                     }
-                    Utils.hideLoading(); Utils.showToast("Upload massal selesai!"); Admin.loadData();
-                }; r.readAsArrayBuffer(f.files[0]);
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: action, data: payload }),
+                        redirect: 'follow'
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const result = await response.json();
+                    app.showLoader(false);
+                    return result;
+                } catch (error) {
+                    app.showLoader(false);
+                    return { status: 'error', message: error.message };
+                }
             },
-            resetProgress: async (un) => {
-                if(!confirm(`Yakin ingin mereset progres map untuk: ${un}?`)) return; Utils.showLoading();
-                if(IS_PREVIEW) { await new Promise(r=>setTimeout(r,500)); const p=DummyDB.progress.find(x=>String(x.username)===String(un)); if(p){p.level_terbuka=1; p.skor_total=0; p.status=Array(50).fill(false);} }
-                else { try { await fetch(GAS_URL, { method:'POST', body:new URLSearchParams({action:'resetProgress', username:un}) }); } catch(err){} }
-                Utils.hideLoading(); Utils.showToast("Progres direset ke awal!"); Admin.loadData();
+
+            simulateBackend: (action, payload) => {
+                if (action === 'register') {
+                    if(mockDB.users.find(u => u.username === payload.username)) return { status: 'error', message: 'Username sudah terdaftar!' };
+                    mockDB.users.push({ ...payload, role: 'student' });
+                    mockDB.progress[payload.username] = { level_terbuka: 1, skor_total: 0, levels: {} };
+                    return { status: 'success', message: 'Berhasil' };
+                }
+                if (action === 'login') {
+                    const user = mockDB.users.find(u => u.username === payload.username && u.password === payload.password);
+                    if (user) {
+                        const {password, ...safeUser} = user; 
+                        return { status: 'success', user: safeUser, progress: mockDB.progress[user.username] || null };
+                    }
+                    return { status: 'error', message: 'Data tidak valid!' };
+                }
+                if (action === 'saveProgress') {
+                    mockDB.progress[payload.username] = payload.progressData;
+                    return { status: 'success' };
+                }
+                if (action === 'getStudents') {
+                    const students = mockDB.users.filter(u => u.role === 'student').map(s => {
+                        return { ...s, progress: mockDB.progress[s.username] || {level_terbuka: 1, skor_total: 0} };
+                    });
+                    return { status: 'success', data: students };
+                }
+                return { status: 'error', message: 'Action invalid' };
             },
-            printReport: () => {
-                let html = `<html><head><title>Laporan ANDHALGO</title><style>body{font-family:sans-serif;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:left;} th{background:#eee;}</style></head><body><h2>Laporan Rekapitulasi ANDHALGO</h2><p>Dicetak tanggal: ${new Date().toLocaleDateString()}</p><table><tr><th>No</th><th>NISN</th><th>Nama</th><th>Kelas</th><th>Tahun</th><th>Max Level</th><th>Total Skor</th></tr>`;
-                Admin.filteredData.forEach((d,i) => { html += `<tr><td>${i+1}</td><td>${d.username}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.tahun_pelajaran}</td><td>${d.level}</td><td>${d.skor}</td></tr>`; });
-                html += `</table></body></html>`; const win = window.open('','','width=800,height=600'); win.document.write(html); win.document.close(); win.print();
+
+            handleRegister: async () => {
+                const nama = document.getElementById('reg-name').value;
+                const username = document.getElementById('reg-username').value;
+                const pass = document.getElementById('reg-password').value;
+                const kelas = document.getElementById('reg-kelas').value;
+
+                if (!kelas || username.includes(' ')) {
+                    Swal.fire('Perhatian', 'Cek kembali isian Anda. Kelas wajib diisi & Username dilarang menggunakan spasi.', 'warning');
+                    return;
+                }
+                const response = await app.fetchGAS('register', { nama_lengkap: nama, username: username, password: pass, kelas: kelas });
+                if (response.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Akun dibuat. Silakan login.' }).then(() => {
+                        document.getElementById('form-register').reset();
+                        app.navigate('login');
+                        document.getElementById('login-username').value = username;
+                    });
+                } else {
+                    Swal.fire('Gagal', response.message, 'error');
+                }
             },
-            showAddLevelModal: () => document.getElementById('add-level-modal').classList.remove('hidden'),
-            generateLevelWithAI: async () => {
-                document.getElementById('add-level-modal').classList.add('hidden'); Utils.showLoading("AI meracik soal...");
-                const cat = document.getElementById('ai-level-cat').value;
-                const apiKey = ""; // API KEY GOOGLE GEMINI JIKA ADA
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            handleLogin: async () => {
+                const response = await app.fetchGAS('login', { 
+                    username: document.getElementById('login-username').value.trim(), 
+                    password: document.getElementById('login-password').value 
+                });
+                if (response.status === 'success') app.handleSuccessfulLogin(response.user, response.progress);
+                else Swal.fire('Gagal', response.message, 'error');
+            },
+
+            handleSuccessfulLogin: (userData, progressData) => {
+                state.currentUser = userData;
+                sessionStorage.setItem('andhalgo_session', JSON.stringify({ user: userData, progress: progressData }));
+                state.userProgress = progressData || { levelTerbuka: 1, skorTotal: 0, levels: {} };
                 
-                try {
-                    if(IS_PREVIEW && !apiKey) {
-                        await new Promise(r=>setTimeout(r,2000));
-                        const newLvl = { title: "AI: " + cat, icon: "fa-robot", category: "AI Gen", grid: [6,6], start: {x:0, y:0, dir:1}, goal: {x:5, y:5}, obstacles: [[2,2]], palette: ["FWD", "RIGHT", "LEFT", "REPEAT_N"], max: 10, minBlocks: 6, solution: [{t:"FWD"},{t:"FWD"}] };
-                        newLvl.id = 20 + DummyDB.customLevels.length + 1;
-                        DummyDB.customLevels.push(newLvl);
+                if (userData.role === 'admin') {
+                    app.navigate('admin');
+                    app.adminRefreshData();
+                } else {
+                    app.navigate('student');
+                    app.initStudentDashboard();
+                }
+            },
+
+            logout: () => {
+                Swal.fire({
+                    title: 'Keluar?', text: "Yakin ingin mengakhiri sesi?", icon: 'question',
+                    showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Keluar'
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        state.currentUser = null;
+                        sessionStorage.removeItem('andhalgo_session');
+                        document.getElementById('form-login').reset();
+                        app.navigate('home');
+                    }
+                });
+            },
+
+            initStudentDashboard: () => {
+                const user = state.currentUser;
+                document.getElementById('student-name-display').innerText = user.nama_lengkap;
+                document.getElementById('student-class-display').innerText = user.kelas || 'Siswa';
+                document.getElementById('student-avatar').innerText = user.nama_lengkap.charAt(0);
+                document.getElementById('student-score').innerText = state.userProgress.skorTotal || 0;
+                
+                const targetLevel = state.userProgress.levelTerbuka > MASTER_LEVELS.length ? MASTER_LEVELS.length : state.userProgress.levelTerbuka;
+                app.loadLevel(targetLevel);
+            },
+
+            loadLevel: (levelId) => {
+                const levelData = MASTER_LEVELS.find(l => l.id === levelId);
+                if (!levelData) return;
+                if (levelId > state.userProgress.levelTerbuka) {
+                    Swal.fire('Terkunci', 'Selesaikan misi sebelumnya.', 'warning');
+                    return;
+                }
+                state.activeLevel = levelId;
+                
+                document.getElementById('current-level-badge').innerText = `Level ${levelId}`;
+                document.getElementById('mission-title').innerHTML = levelData.title;
+                document.getElementById('mission-description').innerHTML = levelData.desc;
+                document.getElementById('mission-hint').innerHTML = levelData.hint;
+
+                logicWorkspace.clear();
+                document.getElementById('console-output').innerHTML = '<div class="text-[#6c7086]">Menunggu kompilasi program...</div>';
+                
+                const toolbox = document.getElementById('toolbox');
+                toolbox.innerHTML = '';
+                
+                levelData.availableBlocks.forEach((block, index) => {
+                    const blockEl = document.createElement('div');
+                    blockEl.className = 'code-block shadow-sm transition-transform hover:-translate-y-0.5 border border-indigo-100 hover:border-indigo-300';
+                    blockEl.draggable = true;
+                    blockEl.dataset.type = block.type;
+                    blockEl.dataset.template = block.template;
+                    blockEl.dataset.expectInput = block.expectInput ? "true" : "false";
+                    
+                    if (block.expectInput) {
+                        const parts = block.text.split('[ ... ]');
+                        blockEl.innerHTML = `
+                            <div class="flex items-center text-sm font-bold text-gray-700">
+                                <span>${parts[0]}</span>
+                                <input type="text" class="block-input mx-2 px-2 py-1 text-xs text-indigo-700 font-mono bg-indigo-50 rounded border border-indigo-200 w-24 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Nilai..">
+                                <span>${parts[1] || ''}</span>
+                            </div>
+                        `;
+                        blockEl.querySelector('input').addEventListener('mousedown', (e) => e.stopPropagation());
                     } else {
-                        const prompt = `Buat soal game logika grid 6x6. Materi: "${cat}". Format JSON: {"title":"Judul","start":{"x":0,"y":0,"dir":1},"goal":{"x":5,"y":5},"obstacles":[[1,2]],"palette":["FWD","RIGHT","LEFT","JUMP","REPEAT_N"],"max":10,"minBlocks":5,"solution":[{"t":"FWD"}]}`;
-                        const payload = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
-                        const res = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                        const data = await res.json();
-                        const newLvl = JSON.parse(data.candidates[0].content.parts[0].text);
-                        newLvl.icon = "fa-magic"; newLvl.category = "AI Gen"; newLvl.grid = [6,6]; newLvl.id = 20 + DummyDB.customLevels.length + 1;
-                        if(IS_PREVIEW) DummyDB.customLevels.push(newLvl); else await fetch(GAS_URL, { method:'POST', body:new URLSearchParams({action:'addLevel', data:JSON.stringify(newLvl)}) });
+                        blockEl.innerHTML = `<div class="text-sm font-bold text-gray-700">${block.text}</div>`;
                     }
-                    Utils.hideLoading(); Utils.showToast("Soal khusus buatan AI telah ditambahkan!"); Admin.loadData();
-                } catch(err) { Utils.hideLoading(); Utils.showToast("Sistem AI belum tersambung.", "error"); }
+
+                    blockEl.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', index); 
+                        setTimeout(() => blockEl.classList.add('opacity-50'), 0);
+                    });
+                    blockEl.addEventListener('dragend', () => blockEl.classList.remove('opacity-50'));
+                    toolbox.appendChild(blockEl);
+                });
+            },
+
+            showLevelSelector: () => {
+                const grid = document.getElementById('level-grid');
+                grid.innerHTML = '';
+
+                MASTER_LEVELS.forEach(level => {
+                    const isUnlocked = level.id <= state.userProgress.levelTerbuka;
+                    const isCompleted = state.userProgress.levels && state.userProgress.levels[level.id] !== undefined;
+                    const isCurrent = level.id === state.activeLevel;
+
+                    let style = 'bg-gray-100 border-gray-200 text-gray-400 opacity-60';
+                    let icon = '<i class="fas fa-lock text-3xl mb-3"></i>';
+                    let action = '';
+
+                    if (isCompleted && !isCurrent) {
+                        style = 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100 cursor-pointer shadow-sm';
+                        icon = '<i class="fas fa-check-circle text-3xl mb-3"></i>';
+                        action = `onclick="app.loadLevelAndCloseModal(${level.id})"`;
+                    } else if (isCurrent) {
+                        style = 'bg-indigo-600 border-indigo-700 text-white shadow-lg shadow-indigo-200 cursor-pointer transform scale-105';
+                        icon = '<i class="fas fa-play-circle text-3xl mb-3"></i>';
+                        action = `onclick="app.loadLevelAndCloseModal(${level.id})"`;
+                    } else if (isUnlocked) {
+                        style = 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 cursor-pointer shadow-sm';
+                        icon = '<i class="fas fa-unlock text-3xl mb-3 opacity-50"></i>';
+                        action = `onclick="app.loadLevelAndCloseModal(${level.id})"`;
+                    }
+
+                    grid.insertAdjacentHTML('beforeend', `
+                        <div ${action} class="${style} border-2 rounded-2xl p-6 flex flex-col items-center justify-center transition-all h-36">
+                            ${icon}
+                            <span class="font-bold text-lg">Lv. ${level.id}</span>
+                        </div>
+                    `);
+                });
+
+                const modal = document.getElementById('level-modal');
+                const content = document.getElementById('level-modal-content');
+                modal.classList.remove('hidden');
+                void modal.offsetWidth; 
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            },
+
+            closeLevelSelector: () => {
+                const modal = document.getElementById('level-modal');
+                const content = document.getElementById('level-modal-content');
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            },
+            loadLevelAndCloseModal: (id) => { app.loadLevel(id); app.closeLevelSelector(); },
+
+            adminRefreshData: async () => {
+                const tbody = document.getElementById('admin-table-body');
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 font-bold"><i class="fas fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>';
+                const response = await app.fetchGAS('getStudents', null);
+
+                if(response.status === 'success') {
+                    const students = response.data;
+                    document.getElementById('admin-stat-users').innerText = students.length;
+                    
+                    if (students.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-400 font-medium">Belum ada siswa terdaftar.</td></tr>';
+                        document.getElementById('admin-stat-score').innerText = 0;
+                        return;
+                    }
+
+                    let totalSkorAll = 0;
+                    tbody.innerHTML = '';
+                    students.forEach(s => {
+                        const skor = s.progress.skor_total || 0;
+                        totalSkorAll += skor;
+                        const levelMaks = s.progress.level_terbuka || 1;
+                        const pBar = Math.min((levelMaks / MASTER_LEVELS.length) * 100, 100);
+                        
+                        tbody.insertAdjacentHTML('beforeend', `
+                            <tr class="hover:bg-indigo-50/30 transition-colors student-row border-b border-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-xl flex justify-center items-center font-bold text-lg">
+                                            ${s.nama_lengkap.charAt(0)}
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-bold text-gray-900 student-name">${s.nama_lengkap}</div>
+                                            <div class="text-xs text-gray-500 student-nisn">NISN: ${s.username}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-100 text-gray-700">${s.kelas || '-'}</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-sm font-bold text-gray-700 w-8">L.${levelMaks}</span>
+                                        <div class="w-24 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-indigo-500 h-2 rounded-full" style="width: ${pBar}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-indigo-600">${skor}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right"><button class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg hover:bg-amber-100">Reset</button></td>
+                            </tr>
+                        `);
+                    });
+                    document.getElementById('admin-stat-score').innerText = Math.round(totalSkorAll / students.length);
+                }
+            },
+            filterAdminTable: () => {
+                const filter = document.getElementById('admin-search').value.toLowerCase();
+                document.querySelectorAll('.student-row').forEach(row => {
+                    const txt = row.querySelector('.student-name').innerText.toLowerCase() + row.querySelector('.student-nisn').innerText.toLowerCase();
+                    row.style.display = txt.includes(filter) ? "" : "none";
+                });
+            },
+            showLoader: (show) => {
+                const l = document.getElementById('global-loader');
+                show ? (l.classList.remove('hidden'), l.classList.add('flex')) : (l.classList.add('hidden'), l.classList.remove('flex'));
             }
         };
 
-        const App = { 
-            init: () => { 
-                UI.showView('landing'); 
-            } 
+        const logicWorkspace = {
+            initDropZone: () => {
+                const dz = document.getElementById('workspace-dropzone');
+                dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+                dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+                dz.addEventListener('drop', (e) => {
+                    e.preventDefault(); dz.classList.remove('drag-over');
+                    
+                    const emptyMsg = document.getElementById('empty-workspace-msg');
+                    if (emptyMsg) emptyMsg.style.display = 'none';
+
+                    const bIdx = e.dataTransfer.getData('text/plain');
+                    if (!bIdx) return; 
+                    
+                    const config = MASTER_LEVELS.find(l => l.id === state.activeLevel).availableBlocks[bIdx];
+                    const nb = document.createElement('div');
+                    nb.className = 'code-block flex justify-between items-center bg-indigo-50/50 border-indigo-400 hover:bg-indigo-50 transition-colors';
+                    nb.dataset.template = config.template;
+                    
+                    let html = '';
+                    if (config.expectInput) {
+                        const pts = config.text.split('[ ... ]');
+                        html = `<div class="flex items-center text-sm font-bold text-indigo-900">
+                                <span>${pts[0]}</span>
+                                <input type="text" class="block-input mx-2 px-2 py-1 text-xs bg-white rounded border border-indigo-200 w-24 outline-none focus:ring-2 focus:ring-indigo-500 font-mono shadow-inner">
+                                <span>${pts[1] || ''}</span></div>`;
+                    } else {
+                        html = `<div class="text-sm font-bold text-indigo-900">${config.text}</div>`;
+                    }
+
+                    nb.innerHTML = `${html}<button class="text-gray-400 hover:text-red-500 ml-2 w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors" onclick="this.parentElement.remove(); logicWorkspace.checkEmpty();"><i class="fas fa-times"></i></button>`;
+                    dz.appendChild(nb);
+                });
+            },
+            checkEmpty: () => {
+                const dz = document.getElementById('workspace-dropzone');
+                if (dz.querySelectorAll('.code-block').length === 0) document.getElementById('empty-workspace-msg').style.display = 'flex';
+            },
+            clear: () => {
+                document.querySelectorAll('#workspace-dropzone .code-block').forEach(b => b.remove());
+                document.getElementById('empty-workspace-msg').style.display = 'flex';
+                document.getElementById('console-output').innerHTML = '<div class="text-[#6c7086]">Workspace dibersihkan.</div>';
+            },
+            run: () => {
+                const blocks = document.querySelectorAll('#workspace-dropzone .code-block');
+                const out = document.getElementById('console-output');
+                
+                if (blocks.length === 0) {
+                    out.innerHTML = '<div class="text-[#f38ba8] font-bold">Error: Workspace kosong. Tarik blok ke area eksekusi.</div>';
+                    return;
+                }
+
+                out.innerHTML = '<div class="text-[#89dceb] font-bold mb-2">>> Memulai kompilasi...</div>';
+                let code = '', hasErr = false;
+
+                blocks.forEach(b => {
+                    let tpl = b.dataset.template;
+                    const inp = b.querySelector('.block-input');
+                    if (inp) {
+                        const val = inp.value.trim();
+                        if (!val) { hasErr = true; inp.classList.add('border-red-500', 'bg-red-50'); } 
+                        else { inp.classList.remove('border-red-500', 'bg-red-50'); tpl = tpl.replace('{{VAL}}', val); }
+                    }
+                    code += tpl + '\n';
+                });
+
+                if (hasErr) return out.innerHTML += '<div class="text-[#f38ba8] font-bold">Error: Ada input yang masih kosong.</div>';
+
+                let logs = [];
+                const vConsole = { log: (msg) => { logs.push(msg); out.insertAdjacentHTML('beforeend', `<div>${msg}</div>`); } };
+
+                try {
+                    new Function('console', code)(vConsole);
+                    if(logs.length === 0) out.innerHTML += '<div class="text-[#6c7086] italic">(Tidak ada output)</div>';
+                    else out.innerHTML += '<div class="text-[#a6e3a1] mt-2 font-bold">[Selesai]</div>';
+                    logicWorkspace.validateResult(logs, code);
+                } catch (e) {
+                    out.innerHTML += `<div class="text-[#f38ba8] mt-1 font-bold">Runtime Error: ${e.message}</div>`;
+                }
+            },
+            validateResult: async (logs, code) => {
+                const lvl = MASTER_LEVELS.find(l => l.id === state.activeLevel);
+                if (lvl.validation(logs, code)) {
+                    const isNew = !state.userProgress.levels || state.userProgress.levels[lvl.id] === undefined;
+                    if (isNew) {
+                        state.userProgress.levels = state.userProgress.levels || {};
+                        state.userProgress.levels[lvl.id] = lvl.points;
+                        state.userProgress.skorTotal = (state.userProgress.skorTotal || 0) + lvl.points;
+                        if (MASTER_LEVELS.some(l => l.id === lvl.id + 1) && state.userProgress.levelTerbuka < lvl.id + 1) {
+                            state.userProgress.levelTerbuka = lvl.id + 1;
+                        }
+                        await app.fetchGAS('saveProgress', { username: state.currentUser.username, progressData: state.userProgress });
+                        document.getElementById('student-score').innerText = state.userProgress.skorTotal;
+                        sessionStorage.setItem('andhalgo_session', JSON.stringify({ user: state.currentUser, progress: state.userProgress }));
+                    }
+
+                    Swal.fire({ title: 'Misi Berhasil! 🎉', text: isNew ? `Selamat! Anda mendapat +${lvl.points} Poin.` : 'Logika Tepat!', icon: 'success', confirmButtonColor: '#10B981' })
+                    .then(() => MASTER_LEVELS.some(l => l.id === lvl.id + 1) ? app.loadLevel(lvl.id + 1) : (Swal.fire('Tamat', 'Semua misi selesai!', 'info'), app.showLevelSelector()));
+                } else {
+                    Swal.fire('Belum Tepat', 'Cek kembali logika Anda.', 'error');
+                }
+            }
         };
-        window.onload = App.init;
+
+        document.addEventListener('DOMContentLoaded', () => { logicWorkspace.initDropZone(); app.init(); });
     </script>
 </body>
 </html>
