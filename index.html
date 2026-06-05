@@ -29,7 +29,7 @@
         }
 
         .executing-block {
-            border-color: #f59e0b !important; /* warna amber */
+            border-color: #f59e0b !important;
             background-color: #fffbeb !important; 
             transform: scale(1.03);
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
@@ -42,11 +42,9 @@
 
     <div id="app" class="w-full flex-1 flex flex-col relative">
 
+        <!-- VIEW: AUTHENTICATION -->
         <div id="view-auth" class="flex-1 flex items-center justify-center p-4 min-h-[100dvh] bg-white fade-in relative overflow-hidden">
-            
             <div class="z-10 w-full max-w-md bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 p-8 md:p-10 relative transform transition-all hover:-translate-y-1 duration-500">
-                
-                <!-- Logo Besar Tanpa Teks Deskripsi -->
                 <div class="text-center mb-8">
                     <img src="https://i.imghippo.com/files/TEo9267qxU.png" alt="ANDHALGO Logo" class="w-40 h-40 mx-auto mb-4 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300">
                     <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">ANDHALGO</h1>
@@ -60,11 +58,11 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-600 mb-1">Username</label>
-                            <input type="text" id="login-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Masukkan username">
+                            <input type="text" id="login-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="peserta / admin">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                            <input type="password" id="login-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Masukkan password">
+                            <input type="password" id="login-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="edudigital">
                         </div>
                         <button onclick="app.login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all mt-2">
                             Masuk <i class="fas fa-sign-in-alt ml-1"></i>
@@ -75,53 +73,107 @@
                     </div>
                 </div>
 
-                <!-- Form Register (Hint Sesuai Permintaan) -->
-        <!-- FORM Register (Hint Sesuai Permintaan) -->
-        <div id="form-register" class="hidden fade-in">
-            <h2 class="text-xl font-bold text-slate-800 mb-6 text-center">Daftar Akun Baru</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Lengkap</label>
-                    <input type="text" id="reg-nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Andhi Asmara Hadi">
+                <!-- Form Register -->
+                <div id="form-register" class="hidden fade-in">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6 text-center">Daftar Akun Baru</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+                            <input type="text" id="reg-nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Nama Lengkap">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-1">Username</label>
+                            <input type="text" id="reg-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="username">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-1">Password</label>
+                            <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="password">
+                        </div>
+                        <button onclick="app.register()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all mt-2">
+                            Daftar Sekarang <i class="fas fa-user-plus ml-1"></i>
+                        </button>
+                    </div>
+                    <div class="mt-6 text-center text-sm text-slate-500">
+                        Sudah punya akun? <button onclick="app.toggleAuth('login')" class="text-blue-600 font-bold hover:underline">Masuk di sini</button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-1">Username</label>
-                    <input type="text" id="reg-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="andhi">
+            </div>
+        </div>
+
+        <!-- MODAL INFO LEVEL -->
+        <div id="modal-level-info" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 relative transform transition-all scale-100 border border-slate-100">
+                <button onclick="app.closeModal('modal-level-info')" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+                <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-4xl mb-5 mx-auto border-4 border-emerald-100 shadow-inner">
+                    <i class="fas fa-flag-checkered"></i>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                    <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="ganteng">
-                </div>
-                <button onclick="app.register()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all mt-2">
-                    Daftar Sekarang <i class="fas fa-user-plus ml-1"></i>
+                <h3 id="modal-title" class="text-xl font-extrabold text-slate-800 text-center mb-2">Level 1: Misi</h3>
+                <p id="modal-desc" class="text-slate-500 text-center mb-8 text-sm leading-relaxed">Deskripsi misi simulasi...</p>
+                <button onclick="app.startArena()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    Mulai Simulasi <i class="fas fa-rocket ml-1"></i>
                 </button>
             </div>
-            <div class="mt-6 text-center text-sm text-slate-500">
-                Sudah punya akun? <button onclick="app.toggleAuth('login')" class="text-blue-600 font-bold hover:underline">Masuk di sini</button>
+        </div>
+
+        <!-- MODAL CUSTOM LOOP (PERULANGAN) -->
+        <div id="modal-custom-loop" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 relative transform transition-all scale-100 border border-slate-100">
+                <button onclick="app.closeModal('modal-custom-loop')" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+                
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-2">
+                    <i class="fas fa-sync text-amber-500"></i> Buat Blok Perulangan
+                </h3>
+                
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-600 mb-1">Pilih Instruksi</label>
+                        <select id="loop-action-select" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all font-bold text-slate-700 bg-slate-50">
+                            <option value="MAJU">⬆️ MAJU</option>
+                            <option value="MUNDUR">⬇️ MUNDUR</option>
+                            <option value="KIRI">↩️ KIRI (Putar)</option>
+                            <option value="KANAN">↪️ KANAN (Putar)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-600 mb-1">Jumlah Pengulangan (n)</label>
+                        <input type="number" id="loop-count-input" min="1" max="20" value="2" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all text-center font-bold text-xl text-amber-600 bg-amber-50">
+                    </div>
+                </div>
+
+                <button onclick="app.confirmLoop()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    Tambahkan Blok <i class="fas fa-plus-circle ml-1"></i>
+                </button>
             </div>
         </div>
 
-    </div>
-</div>
+        <!-- MODAL LEADERBOARD (PAPAN PERINGKAT) -->
+        <div id="modal-leaderboard" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative transform transition-all scale-100 border border-slate-100 flex flex-col max-h-[85vh]">
+                <button onclick="app.closeModal('modal-leaderboard')" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fas fa-times text-xl"></i></button>
+                
+                <div class="text-center mb-4 shrink-0">
+                    <div class="w-16 h-16 bg-gradient-to-tr from-amber-300 to-yellow-500 text-white rounded-full flex items-center justify-center text-3xl mb-2 mx-auto shadow-lg">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-slate-800">Papan Peringkat</h3>
+                    <p class="text-slate-500 text-sm">Top Pejuang Logika ANDHALGO</p>
+                </div>
 
-<!-- MODAL INFO LEVEL (POP UP) -->
-<div id="modal-level-info" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 relative transform transition-all scale-100 border border-slate-100">
-        <button onclick="app.closeModal()" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
-        <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-4xl mb-5 mx-auto border-4 border-emerald-100 shadow-inner">
-            <i class="fas fa-flag-checkered"></i>
+                <div id="leaderboard-list" class="flex-1 overflow-y-auto pr-2 space-y-2 mt-2">
+                    <!-- List disuntik otomatis dari JS -->
+                </div>
+                
+                <div class="shrink-0 mt-4 pt-4 border-t border-slate-100">
+                    <button onclick="app.closeModal('modal-leaderboard')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all border border-slate-200 active:scale-95">
+                        Tutup
+                    </button>
+                </div>
+            </div>
         </div>
-        <h3 id="modal-title" class="text-xl font-extrabold text-slate-800 text-center mb-2">Level 1: Misi</h3>
-        <p id="modal-desc" class="text-slate-500 text-center mb-8 text-sm leading-relaxed">Deskripsi misi simulasi...</p>
-        <button onclick="app.startArena()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
-            Mulai Simulasi <i class="fas fa-rocket ml-1"></i>
-        </button>
-    </div>
-</div>
 
-<!-- MODAL SUCCESS -->
-<div id="modal-success" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center relative transform transition-all scale-100 border border-slate-100">
+        <!-- MODAL SUCCESS -->
+        <div id="modal-success" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center relative transform transition-all scale-100 border border-slate-100">
                 <div class="w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-5xl mb-5 mx-auto border-4 border-amber-100 shadow-inner">
                     <i class="fas fa-trophy"></i>
                 </div>
@@ -151,9 +203,8 @@
             </div>
         </div>
 
-        <!-- DASHBOARD SISWA (PILIH LEVEL & LEADERBOARD) -->
+        <!-- VIEW: DASHBOARD SISWA -->
         <div id="view-dashboard" class="hidden flex-1 flex-col bg-slate-50 fade-in">
-            <!-- Header Dashboard -->
             <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 shadow-sm z-20 sticky top-0">
                 <div class="flex items-center gap-3">
                     <img src="https://i.imghippo.com/files/TEo9267qxU.png" class="w-8 h-8 md:w-10 md:h-10 object-contain">
@@ -175,18 +226,16 @@
 
             <div class="flex-1 p-4 md:p-8">
                 <div class="max-w-6xl mx-auto">
-                    <!-- Top Section: Welcome & Leaderboard -->
                     <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 gap-4">
                         <div>
                             <h2 class="text-2xl font-extrabold text-slate-800">Dashboard Belajar</h2>
                             <p class="text-slate-500 text-sm mt-1">Pilih level untuk memulai simulasi logika. Kumpulkan XP sebanyak-banyaknya!</p>
                         </div>
-                        <button onclick="app.showMessage('Fitur Leaderboard sedang dikembangkan.', 'success')" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 active:scale-95">
+                        <button onclick="app.showLeaderboard()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 active:scale-95">
                             <i class="fas fa-trophy text-amber-300"></i> Papan Peringkat
                         </button>
                     </div>
 
-                    <!-- Level Grid (1 - 20) -->
                     <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-map text-blue-500"></i> Peta Perjalanan Level</h3>
                     <div id="level-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-10">
                         <!-- Grid disuntik otomatis dari JS -->
@@ -195,9 +244,8 @@
             </div>
         </div>
 
-        <!-- ARENA SIMULASI (TAMPILAN CERAH ELEGAN & RESPONSIVE MOBILE) -->
+        <!-- VIEW: ARENA SIMULASI -->
         <div id="view-arena" class="hidden flex-1 flex-col bg-slate-50 fade-in">
-            <!-- Header Arena -->
             <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-20 sticky top-0">
                 <div class="flex items-center gap-4">
                     <button onclick="app.backToDashboard()" class="bg-white hover:bg-slate-50 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-all border border-slate-200 shadow-sm flex items-center gap-2">
@@ -213,10 +261,8 @@
                 </div>
             </div>
 
-            <!-- Layout Utama: Grid Split Responsive -->
             <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 p-4 md:p-6">
-                
-                <!-- Kanan (Desktop) / Atas (Mobile): Layar Simulasi -->
+                <!-- Layar Simulasi -->
                 <div class="order-1 md:order-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col relative overflow-hidden min-h-[300px]">
                     <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                         <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
@@ -225,36 +271,30 @@
                         <span class="text-xs text-slate-500 font-mono">Status: <span class="text-emerald-600 font-bold">Siap</span></span>
                     </div>
                     
-                    <!-- Area Grid Simulasi -->
                     <div class="flex-1 flex items-center justify-center bg-slate-50 rounded-xl border border-slate-200 p-4 shadow-inner relative overflow-hidden">
                         <div class="relative bg-white shadow-lg rounded-lg p-1 w-full max-w-[280px] md:max-w-[320px] aspect-square mx-auto border border-slate-100">
-                            <div id="sim-grid" class="w-full h-full grid grid-cols-5 grid-rows-5 rounded bg-blue-50/30 overflow-hidden relative z-0">
-                                <!-- Grid disuntik otomatis dari JS -->
-                            </div>
+                            <div id="sim-grid" class="w-full h-full grid grid-cols-5 grid-rows-5 rounded bg-blue-50/30 overflow-hidden relative z-0"></div>
                             
-                            <!-- Target/Bendera Element -->
                             <div id="target-flag" class="absolute w-1/5 h-1/5 flex items-center justify-center transition-all duration-300 z-0" style="left: 0%; top: 0%;">
                                 <i class="fas fa-flag text-emerald-500 text-3xl md:text-4xl drop-shadow-md animate-bounce"></i>
                             </div>
 
-                            <!-- Robot Element -->
                             <div id="robot" class="absolute w-1/5 h-1/5 flex items-center justify-center transition-all duration-300 z-10" style="left: 0%; top: 0%;">
                                 <i class="fas fa-robot text-blue-600 text-3xl md:text-4xl drop-shadow-md"></i>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Console Status -->
                     <div class="mt-4 p-3 bg-slate-100 rounded-xl text-xs font-mono text-slate-600 border border-slate-200 flex items-center gap-3 shrink-0">
                         <i class="fas fa-terminal text-slate-400"></i>
                         <span id="sim-status" class="truncate font-bold">Menunggu instruksi...</span>
                     </div>
                 </div>
 
-                <!-- Kiri (Desktop) / Bawah Terbelah (Mobile): Urutan & Blok Kode -->
+                <!-- Kontrol Kode -->
                 <div class="order-2 md:order-1 flex flex-row md:flex-col gap-4 md:gap-6 h-full">
                     
-                    <!-- Kiri (Mobile) / Atas (Desktop): Urutan Program -->
+                    <!-- Urutan Program -->
                     <div class="w-1/2 md:w-full flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col p-3 md:p-4 relative min-h-[200px]">
                         <div class="flex justify-between items-center mb-3 md:mb-4 border-b border-slate-100 pb-2 md:pb-3">
                             <h3 class="text-slate-700 font-bold font-mono text-xs md:text-sm flex items-center gap-1 md:gap-2"><i class="fas fa-list-ol text-blue-500"></i> Urutan</h3>
@@ -263,7 +303,6 @@
                             </button>
                         </div>
                         
-                        <!-- Batas Tinggi untuk memicu scrollbar saat melebihi 5 baris -->
                         <div id="arena-sequence" class="flex-1 max-h-[180px] md:max-h-[260px] bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 p-2 md:p-3 flex flex-col gap-2 overflow-y-auto shadow-inner">
                             <div id="arena-empty-state" class="m-auto text-slate-400 text-center flex flex-col items-center">
                                 <i class="fas fa-code text-2xl md:text-3xl mb-2 opacity-50"></i>
@@ -272,17 +311,31 @@
                         </div>
                     </div>
 
-                    <!-- Kanan (Mobile) / Bawah (Desktop): Blok Kode (Kotak Alat) -->
+                    <!-- Kotak Alat (Toolbox Dinamis) -->
                     <div class="w-1/2 md:w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-3 md:p-5 flex flex-col gap-3 justify-center md:justify-start">
                         <h3 class="text-slate-700 font-bold font-mono text-xs md:text-sm flex items-center gap-2 mb-1 hidden md:flex border-b border-slate-100 pb-2">
                             <i class="fas fa-toolbox text-amber-500"></i> Blok Kode
                         </h3>
                         
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <!-- Blok Dasar (Selalu Muncul) -->
+                        <div id="toolbox-basic" class="grid grid-cols-2 md:grid-cols-4 gap-2">
                             <button onclick="app.addInstruction('MAJU')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-1 py-2 md:py-3 rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all active:scale-95 flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-arrow-up"></i> <span>MAJU</span></button>
                             <button onclick="app.addInstruction('MUNDUR')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-1 py-2 md:py-3 rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all active:scale-95 flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-arrow-down"></i> <span>MUNDUR</span></button>
                             <button onclick="app.addInstruction('KIRI')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-1 py-2 md:py-3 rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all active:scale-95 flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-undo"></i> <span>KIRI</span></button>
                             <button onclick="app.addInstruction('KANAN')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-1 py-2 md:py-3 rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all active:scale-95 flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-redo"></i> <span>KANAN</span></button>
+                        </div>
+
+                        <!-- Blok Loop (Muncul di Level 5+), DIGANTI MENJADI CUSTOM N -->
+                        <div id="toolbox-loop" class="grid grid-cols-1 gap-2 hidden mt-1 border-t border-dashed border-slate-200 pt-2">
+                            <button onclick="app.openLoopModal()" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fas fa-sync"></i> <span>PERULANGAN (n)</span>
+                            </button>
+                        </div>
+
+                        <!-- Blok Kondisi (Muncul di Level 11+) -->
+                        <div id="toolbox-if" class="grid grid-cols-1 md:grid-cols-2 gap-2 hidden mt-1 border-t border-dashed border-slate-200 pt-2">
+                            <button onclick="app.addInstruction('JIKA_BUNTU_KANAN')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-1 py-2 md:py-2 rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all active:scale-95 flex flex-col md:flex-row items-center justify-center gap-1 text-center"><i class="fas fa-code-branch"></i> <span>JIKA BUNTU<br class="hidden md:block"> BELOK KANAN</span></button>
+                            <button onclick="app.addInstruction('JIKA_BUNTU_KIRI')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-1 py-2 md:py-2 rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all active:scale-95 flex flex-col md:flex-row items-center justify-center gap-1 text-center"><i class="fas fa-code-branch"></i> <span>JIKA BUNTU<br class="hidden md:block"> BELOK KIRI</span></button>
                         </div>
                         
                         <button onclick="app.runSimulation()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-3 md:py-4 rounded-xl font-extrabold shadow-md shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 active:scale-95 text-[11px] sm:text-sm mt-1 md:mt-2">
@@ -295,17 +348,24 @@
     </div>
 
     <script>
-        const IS_PREVIEW = false; // Set ke false saat akan diupload ke Github
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwbpM_Oq6Spq-XQ3DBy51Vu6FWsEQ57hooPiL4RkH5vtrHiuBfaDxuQCyyqdpkndBEltA/exec"; 
+        // KONFIGURASI APLIKASI
+        // UBAH IS_PREVIEW KE false JIKA AKAN DI-DEPLOY KE BLOGGER
+        const IS_PREVIEW = false; 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwmLcVbihT9448edi07UKRNA4HaAGxteIJoMauTSKwJzLqQ4gqfUIzsUhdDWVKl1xFacg/exec"; 
         
-        // Menambahkan array completedLevels ke dalam mock user untuk sistem penyimpanan lokal
-        let mockUsers = [{ username: 'budi', password: '123', nama: 'Budi Santoso', skor: 0, completedLevels: [] }];
+        let mockUsers = [
+            { id: 'A001', username: 'admin', password: 'edudigital', nama: 'Admin Guru', role: 'admin', skor: 0, completedLevels: [] },
+            { id: 'U002', username: 'peserta', password: 'edudigital', nama: 'Siswa Teladan', role: 'siswa', skor: 145, completedLevels: [1,2,3] },
+            { id: 'U003', username: 'budi', password: '123', nama: 'Budi Santoso', role: 'siswa', skor: 90, completedLevels: [1,2] },
+            { id: 'U004', username: 'siti', password: '123', nama: 'Siti Rahma', role: 'siswa', skor: 210, completedLevels: [1,2,3,4] }
+        ];
 
         const state = {
             currentUser: null,
+            allUsersData: [], // Untuk Papan Peringkat
             instructions: [],
             robotPos: { x: 0, y: 4 },
-            robotDir: 0, // Arah Kepala (0: Atas, 1: Kanan, 2: Bawah, 3: Kiri)
+            robotDir: 0, // Arah (0: Atas, 1: Kanan, 2: Bawah, 3: Kiri)
             currentLevel: 1,
             currentLevelData: null
         };
@@ -339,7 +399,6 @@
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-                this.showMessage("Sedang memproses...", "success");
 
                 try {
                     if(IS_PREVIEW) {
@@ -348,6 +407,7 @@
                         if(user) {
                             if(!user.completedLevels) user.completedLevels = [];
                             state.currentUser = user;
+                            state.allUsersData = [...mockUsers]; // Simpan untuk Leaderboard
                             this.showDashboard();
                         } else {
                             this.showMessage("Username atau password salah!");
@@ -362,21 +422,20 @@
                         
                         if(data.success) {
                             state.currentUser = data.user;
+                            state.allUsersData = data.users || []; // Menangkap data users untuk Leaderboard
                             state.currentUser.completedLevels = [];
-                            // Menarik dan memfilter data progress khusus untuk user yang sedang login
                             if(data.progress) {
                                 const myProgress = data.progress.filter(p => p.idUser === state.currentUser.id);
                                 state.currentUser.completedLevels = myProgress.map(p => parseInt(p.idLevel));
                             }
-                            
                             this.showDashboard();
                             this.showMessage(""); 
                         } else {
-                            this.showMessage(data.message || "Gagal masuk. Coba lagi.");
+                            this.showMessage(data.message || "Gagal masuk.");
                         }
                     }
                 } catch(error) {
-                    this.showMessage("Terjadi kesalahan jaringan. Gagal menghubungi server.");
+                    this.showMessage("Terjadi kesalahan jaringan.");
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
@@ -402,8 +461,7 @@
                         if(mockUsers.find(x => x.username === cleanU)) {
                             this.showMessage("Username sudah dipakai!");
                         } else {
-                            // Inisialisasi completedLevels kosong untuk user baru
-                            mockUsers.push({ username: cleanU, password: p, nama: n, skor: 0, completedLevels: [] });
+                            mockUsers.push({ id: 'U'+Date.now(), username: cleanU, password: p, nama: n, role: 'siswa', skor: 0, completedLevels: [] });
                             this.showMessage("Berhasil mendaftar! Silakan login.", "success");
                             setTimeout(() => this.toggleAuth('login'), 1500);
                         }
@@ -423,7 +481,7 @@
                         }
                     }
                 } catch(error) {
-                    this.showMessage("Terjadi kesalahan jaringan. Gagal menghubungi server.");
+                    this.showMessage("Terjadi kesalahan jaringan.");
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
@@ -437,8 +495,6 @@
                 document.getElementById('view-arena').classList.add('hidden');
                 document.getElementById('view-arena').classList.remove('flex');
                 document.getElementById('view-auth').classList.remove('hidden');
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
                 this.clearArena();
             },
 
@@ -457,25 +513,65 @@
                 this.renderDashboardLevels();
             },
 
+            showLeaderboard() {
+                const listContainer = document.getElementById('leaderboard-list');
+                listContainer.innerHTML = '';
+                
+                // Ambil data users, filter hanya siswa, dan urutkan berdasarkan skor tertinggi
+                let usersList = (IS_PREVIEW ? mockUsers : state.allUsersData) || [];
+                let sortedStudents = usersList
+                    .filter(u => u.role !== 'admin')
+                    .sort((a, b) => (parseInt(b.skor) || 0) - (parseInt(a.skor) || 0));
+
+                if(sortedStudents.length === 0) {
+                    listContainer.innerHTML = `<div class="text-center text-slate-500 py-4 text-sm">Belum ada data pejuang logika.</div>`;
+                } else {
+                    sortedStudents.forEach((u, index) => {
+                        let rankBadge = '';
+                        if(index === 0) rankBadge = '<div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center font-bold border border-yellow-300">1</div>';
+                        else if(index === 1) rankBadge = '<div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold border border-slate-300">2</div>';
+                        else if(index === 2) rankBadge = '<div class="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold border border-orange-300">3</div>';
+                        else rankBadge = `<div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-sm">${index+1}</div>`;
+
+                        let isMe = state.currentUser && state.currentUser.id === u.id;
+                        let rowClass = isMe ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-white border-slate-100';
+
+                        listContainer.innerHTML += `
+                            <div class="flex items-center justify-between p-3 rounded-xl border ${rowClass}">
+                                <div class="flex items-center gap-3">
+                                    ${rankBadge}
+                                    <div>
+                                        <div class="font-bold text-slate-700 text-sm">${u.nama || u.username} ${isMe ? '<span class="text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-full ml-1">Saya</span>' : ''}</div>
+                                        <div class="text-xs text-slate-500">@${u.username}</div>
+                                    </div>
+                                </div>
+                                <div class="font-extrabold text-amber-500 text-right">
+                                    ${u.skor} <span class="text-[10px] text-amber-600/70 block -mt-1">XP</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('modal-leaderboard').classList.remove('hidden');
+            },
+
             renderDashboardLevels() {
                 const grid = document.getElementById('level-grid');
                 grid.innerHTML = '';
-                
-                // Ambil daftar level yang sudah diselesaikan dari memori state (jika ada)
                 const completed = (state.currentUser && state.currentUser.completedLevels) ? state.currentUser.completedLevels : [];
                 
                 const levelIcons = [
-                    'fa-shoe-prints', 'fa-compass', 'fa-map-signs', 'fa-route', 'fa-flag-checkered',
-                    'fa-puzzle-piece', 'fa-cogs', 'fa-code-branch', 'fa-sync-alt', 'fa-layer-group',
-                    'fa-bolt', 'fa-key', 'fa-unlock-alt', 'fa-shield-alt', 'fa-star',
-                    'fa-gem', 'fa-crown', 'fa-trophy', 'fa-medal', 'fa-space-shuttle'
+                    'fa-shoe-prints', 'fa-compass', 'fa-map-signs', 'fa-route', 'fa-sync-alt',
+                    'fa-sync', 'fa-recycle', 'fa-layer-group', 'fa-compress-arrows-alt', 'fa-asterisk',
+                    'fa-code-branch', 'fa-shield-alt', 'fa-random', 'fa-project-diagram', 'fa-wall',
+                    'fa-sitemap', 'fa-microchip', 'fa-brain', 'fa-network-wired', 'fa-chess-king'
                 ];
 
                 for(let i=1; i<=20; i++) {
                     const isDone = completed.includes(i);
                     const iconClass = levelIcons[i-1] || 'fa-play-circle';
                     
-                    // Rubah warna menjadi Hijau jika sudah diselesaikan
                     const bgClass = isDone 
                         ? 'bg-slate-50 border-emerald-300 hover:border-emerald-500 hover:-translate-y-1 transition-all shadow-sm'
                         : 'bg-white border-blue-200 hover:border-blue-500 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 transition-all shadow-sm';
@@ -483,7 +579,6 @@
                     const iconColor = isDone ? 'text-emerald-500' : 'text-blue-500';
                     const icon = `<i class="fas ${iconClass} ${iconColor} text-3xl"></i>`;
                     
-                    // Lencana status (Terbuka vs Selesai)
                     const statusBadge = isDone
                         ? `<span class="text-xs text-white font-bold mt-1 bg-emerald-500 px-3 py-1 rounded-full border border-emerald-600 shadow-inner flex items-center gap-1"><i class="fas fa-check-circle"></i> Selesai</span>`
                         : `<span class="text-xs text-emerald-600 font-bold mt-1 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Terbuka</span>`;
@@ -501,32 +596,64 @@
             openLevel(levelNum) {
                 state.currentLevel = levelNum;
                 
+                // Konfigurasi Toolbox Dinamis Sesuai Materi
+                document.getElementById('toolbox-loop').classList.toggle('hidden', levelNum < 5);
+                document.getElementById('toolbox-if').classList.toggle('hidden', levelNum < 11);
+
                 const mockLevels = [
-                    { title: 'Konsep Maju Dasar', desc: 'Materi: Mempelajari instruksi sekuensial (berurutan) dasar untuk memindahkan objek dalam satu garis lurus menuju titik koordinat tujuan.', start: {x: 0, y: 4}, target: {x: 0, y: 1}, poin: 10 },
-                    { title: 'Logika Rotasi & Orientasi', desc: 'Materi: Mempelajari kombinasi gerak perpindahan dan perubahan orientasi sumbu (berbelok) untuk navigasi 2 Dimensi.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 15 },
-                    { title: 'Jalur Multi-Langkah', desc: 'Materi: Mengasah kemampuan menyusun algoritma kompleks melewati lintasan bersudut (Zig-Zag) untuk mencapai titik terjauh.', start: {x: 1, y: 4}, target: {x: 4, y: 1}, poin: 20 }
+                    { title: 'Sekuensial Dasar', desc: 'Materi: Mempelajari instruksi berurutan (Sequential) dasar untuk memindahkan robot maju lurus menuju titik koordinat bendera tujuan.', start: {x: 0, y: 4}, target: {x: 0, y: 1}, poin: 10 },
+                    { title: 'Navigasi Belok', desc: 'Materi: Mengombinasikan instruksi gerak maju dan perubahan arah hadap (rotasi kiri/kanan) untuk bernavigasi secara dua dimensi.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 15 },
+                    { title: 'Jalur Bersudut', desc: 'Materi: Mempelajari pemecahan masalah spasial tingkat lanjut dengan melewati jalur bersudut tajam atau zig-zag.', start: {x: 1, y: 4}, target: {x: 3, y: 1}, poin: 20 },
+                    { title: 'Rotasi Awal Robot', desc: 'Materi: Memposisikan dan melatih robot untuk melakukan belokan orientasi arah hadap di awal langkah sebelum bergerak maju.', start: {x: 2, y: 4}, target: {x: 0, y: 2}, poin: 25 },
+                    { title: 'Pengenalan Perulangan (Loop)', desc: 'Materi: Mempelajari struktur kontrol Perulangan (Loop) sederhana untuk mengulang perintah spesifik berkali-kali secara efisien.', start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 30 },
+                    { title: 'Looping Maju Terarah', desc: 'Materi: Mengoptimalkan penggunaan blok instruksi Perulangan (Loop) untuk memindahkan robot lurus ke depan sejauh 4 petak.', start: {x: 2, y: 4}, target: {x: 2, y: 0}, poin: 35 },
+                    { title: 'Looping & Kombinasi Belok', desc: 'Materi: Memadukan fungsi perulangan dengan instruksi orientasi arah hadap untuk melintasi rute berbentuk siku-siku.', start: {x: 0, y: 4}, target: {x: 4, y: 0}, poin: 40 },
+                    { title: 'Looping Multi-Instruksi', desc: 'Materi: Menggunakan blok Perulangan yang diprogram secara beruntun untuk menyelesaikan rute simetris yang cukup panjang.', start: {x: 1, y: 4}, target: {x: 4, y: 2}, poin: 45 },
+                    { title: 'Reduksi Kode Maksimal', desc: 'Materi: Memecahkan tantangan rute panjang dengan seminimal mungkin menggunakan blok instruksi melalui kekuatan Looping.', start: {x: 4, y: 4}, target: {x: 0, y: 0}, poin: 50 },
+                    { title: 'Looping Pola Spiral', desc: 'Materi: Mengasah logika perulangan tingkat tinggi dengan mengendalikan gerakan robot memutar seperti bentuk spiral.', start: {x: 1, y: 3}, target: {x: 3, y: 1}, poin: 55 },
+                    { title: 'Gerbang Pengkondisian (If)', desc: 'Materi: Mempelajari logika keputusan menggunakan blok JIKA. Robot akan mengambil keputusan belok otomatis jika mentok dinding.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 60 },
+                    { title: 'Logika Sensor Tepi (Buntu)', desc: 'Materi: Menggunakan sensor JIKA (BUNTU) untuk mendeteksi tepi/batas grid agar robot berbelok secara otomatis sebelum crash.', start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 65 },
+                    { title: 'Keputusan Otomatis Robot', desc: 'Materi: Menerapkan sensor JIKA agar robot secara reaktif beralih arah saat ada dinding menghadang langkahnya.', start: {x: 1, y: 4}, target: {x: 3, y: 2}, poin: 70 },
+                    { title: 'Pengkondisian Cabang', desc: 'Materi: Menyusun logika percabangan bercabang untuk melintasi jalur berpenghalang di pinggiran grid.', start: {x: 0, y: 3}, target: {x: 4, y: 1}, poin: 75 },
+                    { title: 'Logika Menghindari Tembok', desc: 'Materi: Memprogram robot agar mengambil keputusan belok darurat ketika sensor mendeteksi dinding di ujung sudut.', start: {x: 2, y: 4}, target: {x: 2, y: 1}, poin: 80 },
+                    { title: 'Kombinasi Loop & If-Condition', desc: 'Materi: Menggabungkan konsep Perulangan di dalam jalur yang membutuhkan Pengkondisian sensorik JIKA.', start: {x: 0, y: 4}, target: {x: 3, y: 0}, poin: 85 },
+                    { title: 'Sistem Navigasi Otomatis', desc: 'Materi: Mengombinasikan Loop berulang dengan evaluasi kondisi JIKA (BUNTU) secara konstan di sepanjang jalur.', start: {x: 0, y: 4}, target: {x: 4, y: 2}, poin: 90 },
+                    { title: 'Algoritma Labirin Cerdas', desc: 'Materi: Menguji kemampuan robot melewati grid menggunakan perpaduan intensif antara Loop dan Sensor JIKA.', start: {x: 1, y: 4}, target: {x: 4, y: 0}, poin: 95 },
+                    { title: 'Optimasi Sensorik Kompleks', desc: 'Materi: Mengintegrasikan seluruh logika Rotasi, Perulangan, dan Pengkondisian untuk rute dengan kepadatan tinggi.', start: {x: 0, y: 4}, target: {x: 4, y: 1}, poin: 100 },
+                    { title: 'Master ANDHALGO: Tantangan Final', desc: 'Materi: Ujian evaluasi akhir algoritma. Selesaikan misi menggunakan seluruh arsenal logika Anda secara efisien.', start: {x: 0, y: 4}, target: {x: 3, y: 1}, poin: 150 }
                 ];
                 
-                state.currentLevelData = mockLevels[levelNum - 1] || { 
-                    title: `Tantangan Algoritma`, 
-                    desc: `Materi: Eksplorasi lanjutan perakitan blok kode logika untuk mencapai koordinat target secara efisien pada Level ${levelNum}.`, 
-                    start: {x: 0, y: 4}, 
-                    target: {x: Math.floor(Math.random()*4)+1, y: Math.floor(Math.random()*3)},
-                    poin: 25
-                };
+                state.currentLevelData = mockLevels[levelNum - 1] || { title: `Tantangan ${levelNum}`, desc: `Deskripsi Level ${levelNum}`, start: {x: 0, y: 4}, target: {x: 4, y: 0}, poin: 25 };
 
-                // Tampilkan Modal/Popup Informasi
                 document.getElementById('modal-title').textContent = `Level ${levelNum}: ${state.currentLevelData.title}`;
                 document.getElementById('modal-desc').textContent = state.currentLevelData.desc;
                 document.getElementById('modal-level-info').classList.remove('hidden');
             },
 
-            closeModal() {
-                document.getElementById('modal-level-info').classList.add('hidden');
+            closeModal(modalId) { 
+                document.getElementById(modalId).classList.add('hidden'); 
+            },
+
+            openLoopModal() {
+                document.getElementById('loop-count-input').value = 2; // Default reset
+                document.getElementById('loop-action-select').value = 'MAJU';
+                document.getElementById('modal-custom-loop').classList.remove('hidden');
+            },
+
+            confirmLoop() {
+                let count = parseInt(document.getElementById('loop-count-input').value);
+                let action = document.getElementById('loop-action-select').value;
+                
+                if(isNaN(count) || count < 1) count = 1;
+                
+                // Menyimpan instruksi custom loop ke state
+                let customCmd = `LOOP_${count}_${action}`;
+                this.addInstruction(customCmd);
+                this.closeModal('modal-custom-loop');
             },
 
             startArena() {
-                this.closeModal();
+                this.closeModal('modal-level-info');
                 document.getElementById('view-dashboard').classList.add('hidden');
                 document.getElementById('view-dashboard').classList.remove('flex');
                 
@@ -535,63 +662,13 @@
                 viewArena.classList.add('flex');
                 
                 document.getElementById('arena-level-title').textContent = `Level ${state.currentLevel}`;
-            if(state.currentUser) document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
-            
-            this.clearArena();
-            this.updateTargetVisual();
-        },
-        
-        backToDashboard() {
-            this.showDashboard();
-        },
-
-        openLevel(levelNum) {
-            state.currentLevel = levelNum;
-            
-            const mockLevels = [
-                { title: 'Sekuensial Dasar', desc: 'Materi: Mempelajari instruksi berurutan (Sequential) dasar untuk memindahkan robot maju lurus menuju titik koordinat bendera tujuan.', start: {x: 0, y: 4}, target: {x: 0, y: 1}, poin: 10 },
-                { title: 'Navigasi Belok', desc: 'Materi: Mengombinasikan instruksi gerak maju dan perubahan arah hadap (rotasi kiri/kanan) untuk bernavigasi secara dua dimensi.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 15 },
-                { title: 'Jalur Bersudut', desc: 'Materi: Mempelajari pemecahan masalah spasial tingkat lanjut dengan melewati jalur bersudut tajam atau zig-zag.', start: {x: 1, y: 4}, target: {x: 3, y: 1}, poin: 20 },
-                { title: 'Rotasi Awal Robot', desc: 'Materi: Memposisikan dan melatih robot untuk melakukan belokan orientasi arah hadap di awal langkah sebelum bergerak maju.', start: {x: 2, y: 4}, target: {x: 0, y: 2}, poin: 25 },
-                { title: 'Pengenalan Perulangan (Loop)', desc: 'Materi: Mempelajari struktur kontrol Perulangan (Loop) sederhana untuk mengulang perintah MAJU berkali-kali secara efisien.', start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 30 },
-                { title: 'Looping Maju Terarah', desc: 'Materi: Mengoptimalkan penggunaan blok instruksi Perulangan (Loop) untuk memindahkan robot lurus ke depan sejauh 4 petak.', start: {x: 2, y: 4}, target: {x: 2, y: 0}, poin: 35 },
-                { title: 'Looping & Kombinasi Belok', desc: 'Materi: Memadukan fungsi perulangan maju dengan instruksi orientasi arah hadap untuk melintasi rute berbentuk siku-siku.', start: {x: 0, y: 4}, target: {x: 4, y: 0}, poin: 40 },
-                { title: 'Looping Multi-Instruksi', desc: 'Materi: Menggunakan blok Perulangan yang diprogram secara beruntun untuk menyelesaikan rute simetris yang cukup panjang.', start: {x: 1, y: 4}, target: {x: 4, y: 2}, poin: 45 },
-                { title: 'Reduksi Kode Maksimal', desc: 'Materi: Memecahkan tantangan rute panjang dengan seminimal mungkin menggunakan blok instruksi melalui kekuatan Looping.', start: {x: 4, y: 4}, target: {x: 0, y: 0}, poin: 50 },
-                { title: 'Looping Pola Spiral', desc: 'Materi: Mengasah logika perulangan tingkat tinggi dengan mengendalikan gerakan robot memutar seperti bentuk spiral.', start: {x: 1, y: 3}, target: {x: 3, y: 1}, poin: 55 },
-                { title: 'Gerbang Pengkondisian (If)', desc: 'Materi: Mempelajari logika keputusan (Conditional) menggunakan blok JIKA untuk mendeteksi rintangan batu di depan robot.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 60 },
-                { title: 'Logika Sensor Tepi (Buntu)', desc: 'Materi: Menggunakan sensor JIKA (BUNTU) untuk mendeteksi tepi/batas grid agar robot berbelok secara otomatis sebelum crash.', start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 65 },
-                { title: 'Keputusan Otomatis Robot', desc: 'Materi: Menerapkan sensor JIKA (RINTANGAN) agar robot secara reaktif beralih arah saat ada batu menghadang langkahnya.', start: {x: 1, y: 4}, target: {x: 3, y: 2}, poin: 70 },
-                { title: 'Pengkondisian Cabang', desc: 'Materi: Menyusun logika percabangan bercabang untuk melintasi jalur berpenghalang acak di tengah-tengah grid.', start: {x: 0, y: 3}, target: {x: 4, y: 1}, poin: 75 },
-                { title: 'Logika Menghindari Tembok', desc: 'Materi: Memprogram robot agar mengambil keputusan belok darurat ketika sensor mendeteksi dinding penghalang di ujung sudut.', start: {x: 2, y: 4}, target: {x: 2, y: 1}, poin: 80 },
-                { title: 'Kombinasi Loop & If-Condition', desc: 'Materi: Menggabungkan konsep Perulangan di dalam jalur bercabang yang membutuhkan Pengkondisian sensorik JIKA.', start: {x: 0, y: 4}, target: {x: 3, y: 0}, poin: 85 },
-                { title: 'Sistem Navigasi Otomatis', desc: 'Materi: Mengombinasikan Loop berulang dengan evaluasi kondisi JIKA (RINTANGAN) secara konstan di sepanjang jalur.', start: {x: 0, y: 4}, target: {x: 4, y: 2}, poin: 90 },
-                { title: 'Algoritma Labirin Cerdas', desc: 'Materi: Menguji kemampuan robot melewati koridor grid sempit menggunakan perpaduan intensif antara Loop dan Sensor JIKA.', start: {x: 1, y: 4}, target: {x: 4, y: 0}, poin: 95 },
-                { title: 'Optimasi Sensorik Kompleks', desc: 'Materi: Mengintegrasikan seluruh logika Rotasi, Perulangan, dan Pengkondisian untuk rute dengan kepadatan rintangan tinggi.', start: {x: 0, y: 4}, target: {x: 4, y: 1}, poin: 100 },
-                { title: 'Master ANDHALGO: Tantangan Final', desc: 'Materi: Ujian evaluasi akhir algoritma. Selesaikan misi di grid sangat padat menggunakan seluruh arsenal logika Anda.', start: {x: 0, y: 4}, target: {x: 3, y: 1}, poin: 150 }
-            ];
-            
-            state.currentLevelData = mockLevels[levelNum - 1] || { 
-                title: `Tantangan Algoritma`, 
-                desc: `Materi: Eksplorasi lanjutan perakitan blok kode logika untuk mencapai koordinat target secara efisien pada Level ${levelNum}.`, 
-                start: {x: 0, y: 4}, 
-                target: {x: Math.floor(Math.random()*4)+1, y: Math.floor(Math.random()*3)},
-                poin: 25
-            };
-
-            // Tampilkan Modal/Popup Informasi
-            document.getElementById('modal-title').textContent = `Level ${levelNum}: ${state.currentLevelData.title}`;
-            document.getElementById('modal-desc').textContent = state.currentLevelData.desc;
-            document.getElementById('modal-level-info').classList.remove('hidden');
-        },
-
-        closeModal() {
-            document.getElementById('modal-level-info').classList.add('hidden');
-        },
-            
-            backToDashboard() {
-                this.showDashboard();
+                if(state.currentUser) document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
+                
+                this.clearArena();
+                this.updateTargetVisual();
             },
+            
+            backToDashboard() { this.showDashboard(); },
 
             renderGrid() {
                 const grid = document.getElementById('sim-grid');
@@ -615,9 +692,8 @@
 
             clearArena() {
                 state.instructions = [];
-                // Reset posisi ke titik awal khusus level yang dipilih
                 state.robotPos = { x: state.currentLevelData?.start.x || 0, y: state.currentLevelData?.start.y || 4 };
-                state.robotDir = 0; // Reset hadap robot ke Atas
+                state.robotDir = 0; 
                 this.updateRobotVisual();
                 this.renderSequence();
                 document.getElementById('sim-status').innerHTML = 'Sistem siap. Menunggu instruksi...';
@@ -638,16 +714,33 @@
 
                 state.instructions.forEach((cmd, idx) => {
                     const el = document.createElement('div');
-                    let color = cmd === 'MAJU' || cmd === 'MUNDUR' 
-                        ? 'bg-blue-50 text-blue-700 border-blue-200' 
-                        : 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                    
+                    // Pewarnaan dinamis blok sesuai jenis perintah
+                    let color = 'bg-blue-50 text-blue-700 border-blue-200';
+                    let icon = 'fa-arrow-right';
+                    let label = cmd;
+                    
+                    if(cmd === 'KIRI' || cmd === 'KANAN') { color = 'bg-indigo-50 text-indigo-700 border-indigo-200'; }
+                    
+                    if(cmd.startsWith('LOOP_')) { 
+                        let parts = cmd.split('_');
+                        color = 'bg-amber-50 text-amber-700 border-amber-300'; 
+                        icon = 'fa-sync'; 
+                        label = `Ulangi ${parts[1]}x: <strong>${parts[2]}</strong>`; 
+                    }
+
+                    if(cmd.startsWith('JIKA')) { 
+                        color = 'bg-rose-50 text-rose-700 border-rose-300'; 
+                        icon = 'fa-code-branch'; 
+                        label = cmd.replace(/_/g, ' '); 
+                    }
                         
-                    el.className = `${color} border p-2 rounded-lg flex items-center justify-between text-[11px] md:text-sm font-bold font-mono fade-in shadow-sm relative`;
+                    el.className = `${color} border p-2 rounded-lg flex items-center justify-between text-[11px] md:text-sm font-mono fade-in shadow-sm relative`;
                     el.id = `instr-${idx}`;
                     el.innerHTML = `
                         <div class="flex items-center gap-2">
-                            <span class="w-5 h-5 bg-white rounded flex items-center justify-center text-[10px] text-slate-500 shadow-sm border border-slate-100">${idx + 1}</span>
-                            <span>${cmd}</span>
+                            <span class="w-5 h-5 bg-white rounded flex items-center justify-center font-bold text-[10px] text-slate-500 shadow-sm border border-slate-100">${idx + 1}</span>
+                            <span><i class="fas ${icon} mr-1 opacity-70"></i> ${label}</span>
                         </div>
                         <button onclick="app.removeInstruction(${idx})" class="text-slate-400 hover:text-red-500 p-1 rounded transition-colors" title="Hapus perintah ini">
                             <i class="fas fa-times"></i>
@@ -662,7 +755,6 @@
                 const robot = document.getElementById('robot');
                 robot.style.left = `${state.robotPos.x * 20}%`;
                 robot.style.top = `${state.robotPos.y * 20}%`;
-                // Menambahkan animasi rotasi kepala robot
                 robot.style.transform = `rotate(${state.robotDir * 90}deg)`;
             },
 
@@ -674,24 +766,21 @@
                 }
             },
 
+            // ENGINE SIMULASI YANG DIPERBARUI: Parse Custom Loop Format (LOOP_n_ACTION)
             async runSimulation() {
                 if(state.instructions.length === 0) return;
                 
                 document.getElementById('sim-status').innerHTML = 'Menjalankan program...';
-                
-                // Matikan sementara tombol play & instruksi
                 const allButtons = document.querySelectorAll('#view-arena button');
                 allButtons.forEach(btn => btn.style.pointerEvents = 'none');
-                
-                // Hapus efek glow lama
                 Array.from(document.getElementById('arena-sequence').children).forEach(el => el.classList.remove('executing-block'));
 
                 state.robotPos = { x: state.currentLevelData?.start.x || 0, y: state.currentLevelData?.start.y || 4 };
-                state.robotDir = 0; // Reset hadap
+                state.robotDir = 0; 
                 this.updateRobotVisual();
 
                 for(let i = 0; i < state.instructions.length; i++) {
-                    let cmd = state.instructions[i];
+                    let rawCmd = state.instructions[i];
                     
                     const blockEl = document.getElementById(`instr-${i}`);
                     if(blockEl) {
@@ -699,34 +788,75 @@
                         blockEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
 
-                    await new Promise(r => setTimeout(r, 600)); 
-                    
-                    // Logika Rotasi & Pergerakan Adaptif
-                    if(cmd === 'KIRI') {
-                        state.robotDir = (state.robotDir - 1 + 4) % 4; // Putar Kepala Kiri
-                    } else if(cmd === 'KANAN') {
-                        state.robotDir = (state.robotDir + 1) % 4; // Putar Kepala Kanan
-                    } else if(cmd === 'MAJU') {
-                        if(state.robotDir === 0) state.robotPos.y = Math.max(0, state.robotPos.y - 1);
-                        else if(state.robotDir === 1) state.robotPos.x = Math.min(4, state.robotPos.x + 1);
-                        else if(state.robotDir === 2) state.robotPos.y = Math.min(4, state.robotPos.y + 1);
-                        else if(state.robotDir === 3) state.robotPos.x = Math.max(0, state.robotPos.x - 1);
-                    } else if(cmd === 'MUNDUR') {
-                        if(state.robotDir === 0) state.robotPos.y = Math.min(4, state.robotPos.y + 1);
-                        else if(state.robotDir === 1) state.robotPos.x = Math.max(0, state.robotPos.x - 1);
-                        else if(state.robotDir === 2) state.robotPos.y = Math.max(0, state.robotPos.y - 1);
-                        else if(state.robotDir === 3) state.robotPos.x = Math.min(4, state.robotPos.x + 1);
+                    // Menentukan berapa kali dieksekusi & aksi dasarnya
+                    let executionCount = 1;
+                    let baseAction = rawCmd;
+
+                    if(rawCmd.startsWith('LOOP_')) {
+                        let parts = rawCmd.split('_');
+                        executionCount = parseInt(parts[1]);
+                        baseAction = parts[2];
                     }
-                    
-                    this.updateRobotVisual();
-                    document.getElementById('sim-status').innerHTML = `Eksekusi baris ${i+1}: <span class="font-bold text-blue-600">${cmd}</span> (Arah:${state.robotDir}, X:${state.robotPos.x}, Y:${state.robotPos.y})`;
+
+                    // Lakukan eksekusi sesuai dengan baseAction sebanyak executionCount
+                    for(let j = 0; j < executionCount; j++) {
+                        let actionMsg = baseAction;
+
+                        // Logika IF: JIKA BUNTU
+                        if(baseAction === 'JIKA_BUNTU_KANAN' || baseAction === 'JIKA_BUNTU_KIRI') {
+                            let isBuntu = false;
+                            if(state.robotDir === 0 && state.robotPos.y === 0) isBuntu = true;
+                            if(state.robotDir === 1 && state.robotPos.x === 4) isBuntu = true;
+                            if(state.robotDir === 2 && state.robotPos.y === 4) isBuntu = true;
+                            if(state.robotDir === 3 && state.robotPos.x === 0) isBuntu = true;
+
+                            if(isBuntu) {
+                                if(baseAction === 'JIKA_BUNTU_KANAN') {
+                                    state.robotDir = (state.robotDir + 1) % 4;
+                                    actionMsg = 'Mentok! Otomatis Belok KANAN';
+                                } else {
+                                    state.robotDir = (state.robotDir - 1 + 4) % 4;
+                                    actionMsg = 'Mentok! Otomatis Belok KIRI';
+                                }
+                            } else {
+                                actionMsg = 'Aman, Tetap MAJU';
+                                if(state.robotDir === 0) state.robotPos.y = Math.max(0, state.robotPos.y - 1);
+                                else if(state.robotDir === 1) state.robotPos.x = Math.min(4, state.robotPos.x + 1);
+                                else if(state.robotDir === 2) state.robotPos.y = Math.min(4, state.robotPos.y + 1);
+                                else if(state.robotDir === 3) state.robotPos.x = Math.max(0, state.robotPos.x - 1);
+                            }
+                        } 
+                        // Logika Gerakan Dasar
+                        else {
+                            if(baseAction === 'KIRI') state.robotDir = (state.robotDir - 1 + 4) % 4;
+                            else if(baseAction === 'KANAN') state.robotDir = (state.robotDir + 1) % 4;
+                            else if(baseAction === 'MAJU') {
+                                if(state.robotDir === 0) state.robotPos.y = Math.max(0, state.robotPos.y - 1);
+                                else if(state.robotDir === 1) state.robotPos.x = Math.min(4, state.robotPos.x + 1);
+                                else if(state.robotDir === 2) state.robotPos.y = Math.min(4, state.robotPos.y + 1);
+                                else if(state.robotDir === 3) state.robotPos.x = Math.max(0, state.robotPos.x - 1);
+                            } else if(baseAction === 'MUNDUR') {
+                                if(state.robotDir === 0) state.robotPos.y = Math.min(4, state.robotPos.y + 1);
+                                else if(state.robotDir === 1) state.robotPos.x = Math.max(0, state.robotPos.x - 1);
+                                else if(state.robotDir === 2) state.robotPos.y = Math.max(0, state.robotPos.y - 1);
+                                else if(state.robotDir === 3) state.robotPos.x = Math.min(4, state.robotPos.x + 1);
+                            }
+                        }
+                        
+                        this.updateRobotVisual();
+                        
+                        let loopText = executionCount > 1 ? ` (Perulangan ${j+1}/${executionCount})` : '';
+                        document.getElementById('sim-status').innerHTML = `Mengeksekusi: <span class="font-bold text-blue-600">${actionMsg}</span>${loopText}`;
+                        
+                        await new Promise(r => setTimeout(r, 600));
+                    }
                     
                     if(blockEl) blockEl.classList.remove('executing-block');
                 }
                 
-                // Kembalikan fungsionalitas tombol
                 allButtons.forEach(btn => btn.style.pointerEvents = 'auto');
 
+                // Verifikasi Kemenangan
                 if(state.currentLevelData && state.robotPos.x === state.currentLevelData.target.x && state.robotPos.y === state.currentLevelData.target.y) {
                     document.getElementById('sim-status').innerHTML = '<i class="fas fa-check-circle text-emerald-500"></i> <span class="text-emerald-600 font-extrabold">Misi Berhasil! Robot mencapai target.</span>';
                     
@@ -736,24 +866,20 @@
                         setTimeout(() => targetIcon.classList.remove('fa-spin'), 3000);
                     }
 
-                    // Logika Penambahan Nilai & Auto-Save Progress
                     const earnedXP = state.currentLevelData.poin || 10;
                     let isNewCompletion = false;
                     
                     if(state.currentUser) {
                         if(!state.currentUser.completedLevels) state.currentUser.completedLevels = [];
                         
-                        // Jika level ini belum pernah diselesaikan, beri poin dan simpan ke database
                         if(!state.currentUser.completedLevels.includes(state.currentLevel)) {
                             isNewCompletion = true;
                             state.currentUser.skor += earnedXP;
                             state.currentUser.completedLevels.push(state.currentLevel);
                             
-                            // Update skor di interface
                             document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
                             document.getElementById('dash-student-xp').textContent = `${state.currentUser.skor} XP`;
 
-                            // Kirim request ke backend untuk menyimpan progress secara permanen
                             if(!IS_PREVIEW) {
                                 const formData = new URLSearchParams();
                                 formData.append('action', 'submitLevel');
@@ -762,13 +888,11 @@
                                     levelId: state.currentLevel,
                                     poin: earnedXP
                                 }));
-                                // Request berjalan diam-diam (background) tanpa mengganggu UX pengguna
                                 fetch(GAS_URL, { method: 'POST', body: formData }).catch(e => console.log("Silent save failed", e));
                             }
                         }
                     }
 
-                    // Tampilkan Modal Sukses (Informasikan bila XP sudah pernah diambil sebelumnya)
                     setTimeout(() => {
                         document.getElementById('success-level-xp').textContent = isNewCompletion ? `+${earnedXP} XP` : `+0 XP (Sudah Selesai)`;
                         document.getElementById('success-total-xp').textContent = `${state.currentUser ? state.currentUser.skor : earnedXP} XP`;
