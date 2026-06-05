@@ -76,51 +76,52 @@
                 </div>
 
                 <!-- Form Register (Hint Sesuai Permintaan) -->
-                <div id="form-register" class="hidden fade-in">
-                    <h2 class="text-xl font-bold text-slate-800 mb-6 text-center">Daftar Akun Baru</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Lengkap</label>
-                            <input type="text" id="reg-nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Andhi Asmara Hadi">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-600 mb-1">Username</label>
-                            <input type="text" id="reg-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="andhi">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                            <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="ganteng">
-                        </div>
-                        <button onclick="app.register()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all mt-2">
-                            Daftar Sekarang <i class="fas fa-user-plus ml-1"></i>
-                        </button>
-                    </div>
-                    <div class="mt-6 text-center text-sm text-slate-500">
-                        Sudah punya akun? <button onclick="app.toggleAuth('login')" class="text-blue-600 font-bold hover:underline">Masuk di sini</button>
-                    </div>
+        <!-- FORM Register (Hint Sesuai Permintaan) -->
+        <div id="form-register" class="hidden fade-in">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 text-center">Daftar Akun Baru</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+                    <input type="text" id="reg-nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Andhi Asmara Hadi">
                 </div>
-
-            </div>
-        </div>
-
-        <!-- MODAL INFO LEVEL (POP UP) -->
-        <div id="modal-level-info" class="hidden absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 relative transform transition-all scale-100 border border-slate-100">
-                <button onclick="app.closeModal()" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
-                <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-4xl mb-5 mx-auto border-4 border-emerald-100 shadow-inner">
-                    <i class="fas fa-flag-checkered"></i>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Username</label>
+                    <input type="text" id="reg-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="andhi">
                 </div>
-                <h3 id="modal-title" class="text-xl font-extrabold text-slate-800 text-center mb-2">Level 1: Misi</h3>
-                <p id="modal-desc" class="text-slate-500 text-center mb-8 text-sm leading-relaxed">Deskripsi misi simulasi...</p>
-                <button onclick="app.startArena()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
-                    Mulai Simulasi <i class="fas fa-rocket ml-1"></i>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="ganteng">
+                </div>
+                <button onclick="app.register()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all mt-2">
+                    Daftar Sekarang <i class="fas fa-user-plus ml-1"></i>
                 </button>
             </div>
+            <div class="mt-6 text-center text-sm text-slate-500">
+                Sudah punya akun? <button onclick="app.toggleAuth('login')" class="text-blue-600 font-bold hover:underline">Masuk di sini</button>
+            </div>
         </div>
 
-        <!-- MODAL SUCCESS -->
-        <div id="modal-success" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center relative transform transition-all scale-100 border border-slate-100">
+    </div>
+</div>
+
+<!-- MODAL INFO LEVEL (POP UP) -->
+<div id="modal-level-info" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 relative transform transition-all scale-100 border border-slate-100">
+        <button onclick="app.closeModal()" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+        <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-4xl mb-5 mx-auto border-4 border-emerald-100 shadow-inner">
+            <i class="fas fa-flag-checkered"></i>
+        </div>
+        <h3 id="modal-title" class="text-xl font-extrabold text-slate-800 text-center mb-2">Level 1: Misi</h3>
+        <p id="modal-desc" class="text-slate-500 text-center mb-8 text-sm leading-relaxed">Deskripsi misi simulasi...</p>
+        <button onclick="app.startArena()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
+            Mulai Simulasi <i class="fas fa-rocket ml-1"></i>
+        </button>
+    </div>
+</div>
+
+<!-- MODAL SUCCESS -->
+<div id="modal-success" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center relative transform transition-all scale-100 border border-slate-100">
                 <div class="w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-5xl mb-5 mx-auto border-4 border-amber-100 shadow-inner">
                     <i class="fas fa-trophy"></i>
                 </div>
@@ -534,11 +535,59 @@
                 viewArena.classList.add('flex');
                 
                 document.getElementById('arena-level-title').textContent = `Level ${state.currentLevel}`;
-                if(state.currentUser) document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
-                
-                this.clearArena();
-                this.updateTargetVisual();
-            },
+            if(state.currentUser) document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
+            
+            this.clearArena();
+            this.updateTargetVisual();
+        },
+        
+        backToDashboard() {
+            this.showDashboard();
+        },
+
+        openLevel(levelNum) {
+            state.currentLevel = levelNum;
+            
+            const mockLevels = [
+                { title: 'Sekuensial Dasar', desc: 'Materi: Mempelajari instruksi berurutan (Sequential) dasar untuk memindahkan robot maju lurus menuju titik koordinat bendera tujuan.', start: {x: 0, y: 4}, target: {x: 0, y: 1}, poin: 10 },
+                { title: 'Navigasi Belok', desc: 'Materi: Mengombinasikan instruksi gerak maju dan perubahan arah hadap (rotasi kiri/kanan) untuk bernavigasi secara dua dimensi.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 15 },
+                { title: 'Jalur Bersudut', desc: 'Materi: Mempelajari pemecahan masalah spasial tingkat lanjut dengan melewati jalur bersudut tajam atau zig-zag.', start: {x: 1, y: 4}, target: {x: 3, y: 1}, poin: 20 },
+                { title: 'Rotasi Awal Robot', desc: 'Materi: Memposisikan dan melatih robot untuk melakukan belokan orientasi arah hadap di awal langkah sebelum bergerak maju.', start: {x: 2, y: 4}, target: {x: 0, y: 2}, poin: 25 },
+                { title: 'Pengenalan Perulangan (Loop)', desc: 'Materi: Mempelajari struktur kontrol Perulangan (Loop) sederhana untuk mengulang perintah MAJU berkali-kali secara efisien.', start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 30 },
+                { title: 'Looping Maju Terarah', desc: 'Materi: Mengoptimalkan penggunaan blok instruksi Perulangan (Loop) untuk memindahkan robot lurus ke depan sejauh 4 petak.', start: {x: 2, y: 4}, target: {x: 2, y: 0}, poin: 35 },
+                { title: 'Looping & Kombinasi Belok', desc: 'Materi: Memadukan fungsi perulangan maju dengan instruksi orientasi arah hadap untuk melintasi rute berbentuk siku-siku.', start: {x: 0, y: 4}, target: {x: 4, y: 0}, poin: 40 },
+                { title: 'Looping Multi-Instruksi', desc: 'Materi: Menggunakan blok Perulangan yang diprogram secara beruntun untuk menyelesaikan rute simetris yang cukup panjang.', start: {x: 1, y: 4}, target: {x: 4, y: 2}, poin: 45 },
+                { title: 'Reduksi Kode Maksimal', desc: 'Materi: Memecahkan tantangan rute panjang dengan seminimal mungkin menggunakan blok instruksi melalui kekuatan Looping.', start: {x: 4, y: 4}, target: {x: 0, y: 0}, poin: 50 },
+                { title: 'Looping Pola Spiral', desc: 'Materi: Mengasah logika perulangan tingkat tinggi dengan mengendalikan gerakan robot memutar seperti bentuk spiral.', start: {x: 1, y: 3}, target: {x: 3, y: 1}, poin: 55 },
+                { title: 'Gerbang Pengkondisian (If)', desc: 'Materi: Mempelajari logika keputusan (Conditional) menggunakan blok JIKA untuk mendeteksi rintangan batu di depan robot.', start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 60 },
+                { title: 'Logika Sensor Tepi (Buntu)', desc: 'Materi: Menggunakan sensor JIKA (BUNTU) untuk mendeteksi tepi/batas grid agar robot berbelok secara otomatis sebelum crash.', start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 65 },
+                { title: 'Keputusan Otomatis Robot', desc: 'Materi: Menerapkan sensor JIKA (RINTANGAN) agar robot secara reaktif beralih arah saat ada batu menghadang langkahnya.', start: {x: 1, y: 4}, target: {x: 3, y: 2}, poin: 70 },
+                { title: 'Pengkondisian Cabang', desc: 'Materi: Menyusun logika percabangan bercabang untuk melintasi jalur berpenghalang acak di tengah-tengah grid.', start: {x: 0, y: 3}, target: {x: 4, y: 1}, poin: 75 },
+                { title: 'Logika Menghindari Tembok', desc: 'Materi: Memprogram robot agar mengambil keputusan belok darurat ketika sensor mendeteksi dinding penghalang di ujung sudut.', start: {x: 2, y: 4}, target: {x: 2, y: 1}, poin: 80 },
+                { title: 'Kombinasi Loop & If-Condition', desc: 'Materi: Menggabungkan konsep Perulangan di dalam jalur bercabang yang membutuhkan Pengkondisian sensorik JIKA.', start: {x: 0, y: 4}, target: {x: 3, y: 0}, poin: 85 },
+                { title: 'Sistem Navigasi Otomatis', desc: 'Materi: Mengombinasikan Loop berulang dengan evaluasi kondisi JIKA (RINTANGAN) secara konstan di sepanjang jalur.', start: {x: 0, y: 4}, target: {x: 4, y: 2}, poin: 90 },
+                { title: 'Algoritma Labirin Cerdas', desc: 'Materi: Menguji kemampuan robot melewati koridor grid sempit menggunakan perpaduan intensif antara Loop dan Sensor JIKA.', start: {x: 1, y: 4}, target: {x: 4, y: 0}, poin: 95 },
+                { title: 'Optimasi Sensorik Kompleks', desc: 'Materi: Mengintegrasikan seluruh logika Rotasi, Perulangan, dan Pengkondisian untuk rute dengan kepadatan rintangan tinggi.', start: {x: 0, y: 4}, target: {x: 4, y: 1}, poin: 100 },
+                { title: 'Master ANDHALGO: Tantangan Final', desc: 'Materi: Ujian evaluasi akhir algoritma. Selesaikan misi di grid sangat padat menggunakan seluruh arsenal logika Anda.', start: {x: 0, y: 4}, target: {x: 3, y: 1}, poin: 150 }
+            ];
+            
+            state.currentLevelData = mockLevels[levelNum - 1] || { 
+                title: `Tantangan Algoritma`, 
+                desc: `Materi: Eksplorasi lanjutan perakitan blok kode logika untuk mencapai koordinat target secara efisien pada Level ${levelNum}.`, 
+                start: {x: 0, y: 4}, 
+                target: {x: Math.floor(Math.random()*4)+1, y: Math.floor(Math.random()*3)},
+                poin: 25
+            };
+
+            // Tampilkan Modal/Popup Informasi
+            document.getElementById('modal-title').textContent = `Level ${levelNum}: ${state.currentLevelData.title}`;
+            document.getElementById('modal-desc').textContent = state.currentLevelData.desc;
+            document.getElementById('modal-level-info').classList.remove('hidden');
+        },
+
+        closeModal() {
+            document.getElementById('modal-level-info').classList.add('hidden');
+        },
             
             backToDashboard() {
                 this.showDashboard();
