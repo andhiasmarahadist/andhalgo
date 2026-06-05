@@ -38,11 +38,11 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
+<body class="bg-slate-50 text-slate-800 min-h-[100dvh] flex flex-col">
 
-    <div id="app" class="w-full h-full flex flex-col relative">
+    <div id="app" class="w-full flex-1 flex flex-col relative">
 
-        <div id="view-auth" class="flex-1 flex items-center justify-center p-4 bg-white fade-in relative overflow-hidden">
+        <div id="view-auth" class="flex-1 flex items-center justify-center p-4 min-h-[100dvh] bg-white fade-in relative overflow-hidden">
             
             <div class="z-10 w-full max-w-md bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 p-8 md:p-10 relative transform transition-all hover:-translate-y-1 duration-500">
                 
@@ -151,9 +151,9 @@
         </div>
 
         <!-- DASHBOARD SISWA (PILIH LEVEL & LEADERBOARD) -->
-        <div id="view-dashboard" class="hidden flex-1 flex-col bg-slate-50 overflow-hidden fade-in">
+        <div id="view-dashboard" class="hidden flex-1 flex-col bg-slate-50 fade-in">
             <!-- Header Dashboard -->
-            <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 shadow-sm z-10">
+            <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 shadow-sm z-20 sticky top-0">
                 <div class="flex items-center gap-3">
                     <img src="https://i.imghippo.com/files/TEo9267qxU.png" class="w-8 h-8 md:w-10 md:h-10 object-contain">
                     <span class="font-bold text-slate-800 text-lg tracking-wide hidden sm:block">ANDHALGO</span>
@@ -172,7 +172,7 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="flex-1 p-4 md:p-8">
                 <div class="max-w-6xl mx-auto">
                     <!-- Top Section: Welcome & Leaderboard -->
                     <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 gap-4">
@@ -195,9 +195,9 @@
         </div>
 
         <!-- ARENA SIMULASI (TAMPILAN CERAH ELEGAN & RESPONSIVE MOBILE) -->
-        <div id="view-arena" class="hidden flex-1 flex-col bg-slate-50 overflow-hidden fade-in">
+        <div id="view-arena" class="hidden flex-1 flex-col bg-slate-50 fade-in">
             <!-- Header Arena -->
-            <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 z-10 shadow-sm">
+            <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-20 sticky top-0">
                 <div class="flex items-center gap-4">
                     <button onclick="app.backToDashboard()" class="bg-white hover:bg-slate-50 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-all border border-slate-200 shadow-sm flex items-center gap-2">
                         <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Kembali</span>
@@ -213,7 +213,7 @@
             </div>
 
             <!-- Layout Utama: Grid Split Responsive -->
-            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 p-4 md:p-6 overflow-y-auto">
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 p-4 md:p-6">
                 
                 <!-- Kanan (Desktop) / Atas (Mobile): Layar Simulasi -->
                 <div class="order-1 md:order-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col relative overflow-hidden min-h-[300px]">
@@ -297,7 +297,8 @@
         const IS_PREVIEW = false; // Set ke false saat akan diupload ke Github
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwbpM_Oq6Spq-XQ3DBy51Vu6FWsEQ57hooPiL4RkH5vtrHiuBfaDxuQCyyqdpkndBEltA/exec"; 
         
-        let mockUsers = [{ username: 'budi', password: '123', nama: 'Budi Santoso', skor: 0 }];
+        // Menambahkan array completedLevels ke dalam mock user untuk sistem penyimpanan lokal
+        let mockUsers = [{ username: 'budi', password: '123', nama: 'Budi Santoso', skor: 0, completedLevels: [] }];
 
         const state = {
             currentUser: null,
@@ -344,6 +345,7 @@
                         await new Promise(r => setTimeout(r, 500));
                         const user = mockUsers.find(x => x.username === cleanU && x.password === p);
                         if(user) {
+                            if(!user.completedLevels) user.completedLevels = [];
                             state.currentUser = user;
                             this.showDashboard();
                         } else {
@@ -359,6 +361,13 @@
                         
                         if(data.success) {
                             state.currentUser = data.user;
+                            state.currentUser.completedLevels = [];
+                            // Menarik dan memfilter data progress khusus untuk user yang sedang login
+                            if(data.progress) {
+                                const myProgress = data.progress.filter(p => p.idUser === state.currentUser.id);
+                                state.currentUser.completedLevels = myProgress.map(p => parseInt(p.idLevel));
+                            }
+                            
                             this.showDashboard();
                             this.showMessage(""); 
                         } else {
@@ -392,7 +401,8 @@
                         if(mockUsers.find(x => x.username === cleanU)) {
                             this.showMessage("Username sudah dipakai!");
                         } else {
-                            mockUsers.push({ username: cleanU, password: p, nama: n, skor: 0 });
+                            // Inisialisasi completedLevels kosong untuk user baru
+                            mockUsers.push({ username: cleanU, password: p, nama: n, skor: 0, completedLevels: [] });
                             this.showMessage("Berhasil mendaftar! Silakan login.", "success");
                             setTimeout(() => this.toggleAuth('login'), 1500);
                         }
@@ -450,7 +460,9 @@
                 const grid = document.getElementById('level-grid');
                 grid.innerHTML = '';
                 
-                // Ikon Unik & Elegan untuk setiap level (1-20)
+                // Ambil daftar level yang sudah diselesaikan dari memori state (jika ada)
+                const completed = (state.currentUser && state.currentUser.completedLevels) ? state.currentUser.completedLevels : [];
+                
                 const levelIcons = [
                     'fa-shoe-prints', 'fa-compass', 'fa-map-signs', 'fa-route', 'fa-flag-checkered',
                     'fa-puzzle-piece', 'fa-cogs', 'fa-code-branch', 'fa-sync-alt', 'fa-layer-group',
@@ -459,16 +471,27 @@
                 ];
 
                 for(let i=1; i<=20; i++) {
+                    const isDone = completed.includes(i);
                     const iconClass = levelIcons[i-1] || 'fa-play-circle';
-                    // Semua Level Terbuka
-                    const bgClass = 'bg-white border-blue-200 hover:border-blue-500 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 transition-all shadow-sm';
-                    const icon = `<i class="fas ${iconClass} text-blue-500 text-3xl"></i>`;
+                    
+                    // Rubah warna menjadi Hijau jika sudah diselesaikan
+                    const bgClass = isDone 
+                        ? 'bg-slate-50 border-emerald-300 hover:border-emerald-500 hover:-translate-y-1 transition-all shadow-sm'
+                        : 'bg-white border-blue-200 hover:border-blue-500 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 transition-all shadow-sm';
+                        
+                    const iconColor = isDone ? 'text-emerald-500' : 'text-blue-500';
+                    const icon = `<i class="fas ${iconClass} ${iconColor} text-3xl"></i>`;
+                    
+                    // Lencana status (Terbuka vs Selesai)
+                    const statusBadge = isDone
+                        ? `<span class="text-xs text-white font-bold mt-1 bg-emerald-500 px-3 py-1 rounded-full border border-emerald-600 shadow-inner flex items-center gap-1"><i class="fas fa-check-circle"></i> Selesai</span>`
+                        : `<span class="text-xs text-emerald-600 font-bold mt-1 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Terbuka</span>`;
                     
                     grid.innerHTML += `
                         <div onclick="app.openLevel(${i})" class="flex flex-col items-center justify-center p-6 rounded-2xl border-2 ${bgClass}">
                             <div class="mb-3">${icon}</div>
                             <h3 class="font-bold text-slate-700">Level ${i}</h3>
-                            <span class="text-xs text-emerald-600 font-bold mt-1 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Terbuka</span>
+                            ${statusBadge}
                         </div>
                     `;
                 }
@@ -664,17 +687,41 @@
                         setTimeout(() => targetIcon.classList.remove('fa-spin'), 3000);
                     }
 
-                    // Tambahkan Nilai
+                    // Logika Penambahan Nilai & Auto-Save Progress
                     const earnedXP = state.currentLevelData.poin || 10;
+                    let isNewCompletion = false;
+                    
                     if(state.currentUser) {
-                        state.currentUser.skor += earnedXP;
-                        document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
-                        document.getElementById('dash-student-xp').textContent = `${state.currentUser.skor} XP`;
+                        if(!state.currentUser.completedLevels) state.currentUser.completedLevels = [];
+                        
+                        // Jika level ini belum pernah diselesaikan, beri poin dan simpan ke database
+                        if(!state.currentUser.completedLevels.includes(state.currentLevel)) {
+                            isNewCompletion = true;
+                            state.currentUser.skor += earnedXP;
+                            state.currentUser.completedLevels.push(state.currentLevel);
+                            
+                            // Update skor di interface
+                            document.getElementById('student-xp').textContent = `${state.currentUser.skor} XP`;
+                            document.getElementById('dash-student-xp').textContent = `${state.currentUser.skor} XP`;
+
+                            // Kirim request ke backend untuk menyimpan progress secara permanen
+                            if(!IS_PREVIEW) {
+                                const formData = new URLSearchParams();
+                                formData.append('action', 'submitLevel');
+                                formData.append('payload', JSON.stringify({
+                                    userId: state.currentUser.id,
+                                    levelId: state.currentLevel,
+                                    poin: earnedXP
+                                }));
+                                // Request berjalan diam-diam (background) tanpa mengganggu UX pengguna
+                                fetch(GAS_URL, { method: 'POST', body: formData }).catch(e => console.log("Silent save failed", e));
+                            }
+                        }
                     }
 
-                    // Tampilkan Modal Sukses
+                    // Tampilkan Modal Sukses (Informasikan bila XP sudah pernah diambil sebelumnya)
                     setTimeout(() => {
-                        document.getElementById('success-level-xp').textContent = `+${earnedXP} XP`;
+                        document.getElementById('success-level-xp').textContent = isNewCompletion ? `+${earnedXP} XP` : `+0 XP (Sudah Selesai)`;
                         document.getElementById('success-total-xp').textContent = `${state.currentUser ? state.currentUser.skor : earnedXP} XP`;
                         document.getElementById('modal-success').classList.remove('hidden');
                     }, 800);
