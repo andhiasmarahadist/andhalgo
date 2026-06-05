@@ -81,15 +81,15 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Lengkap</label>
-                            <input type="text" id="reg-nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Nama lengkap Anda">
+                            <input type="text" id="reg-nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Andhi Asmara Hadi">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-600 mb-1">Username</label>
-                            <input type="text" id="reg-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Buat username (tanpa spasi)">
+                            <input type="text" id="reg-username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="andhi">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                            <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Buat password">
+                            <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="ganteng">
                         </div>
                         <button onclick="app.register()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all mt-2">
                             Daftar Sekarang <i class="fas fa-user-plus ml-1"></i>
@@ -197,7 +197,7 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwbpM_Oq6Spq-XQ3DBy51Vu6FWsEQ57hooPiL4RkH5vtrHiuBfaDxuQCyyqdpkndBEltA/exec"; 
         
         // Mock Database Lokal
-        let mockUsers = [{ username: 'andhi', password: '123456', nama: 'Andhi Ganteng', skor: 0 }];
+        let mockUsers = [{ username: 'budi', password: '123', nama: 'Budi Santoso', skor: 0 }];
 
         // State Aplikasi
         const state = {
@@ -236,8 +236,15 @@
                 // Normalisasi di frontend sebagai lapis pertama
                 const cleanU = u.replace(/^@/, '').toLowerCase();
 
-                if(IS_PREVIEW) {
-                    setTimeout(() => {
+                // Kunci tombol agar tidak di-klik berkali-kali (mencegah hang)
+                const btn = document.querySelector('button[onclick="app.login()"]');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+                try {
+                    if(IS_PREVIEW) {
+                        await new Promise(r => setTimeout(r, 500));
                         const user = mockUsers.find(x => x.username.toLowerCase() === cleanU && x.password === p);
                         if(user) {
                             state.currentUser = user;
@@ -245,10 +252,33 @@
                         } else {
                             this.showMessage("Username atau password salah!");
                         }
-                    }, 500);
-                } else {
-                    // API Call ke GAS (nanti)
-                    // fetch...
+                    } else {
+                        // KONEKSI NYATA KE GOOGLE APPS SCRIPT
+                        // Menggunakan URLSearchParams agar terbaca oleh e.parameter di Apps Script
+                        const formData = new URLSearchParams();
+                        formData.append('action', 'login');
+                        formData.append('payload', JSON.stringify({ username: cleanU, password: p }));
+
+                        const response = await fetch(GAS_URL, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        
+                        if(data.success) {
+                            state.currentUser = data.user;
+                            this.showViewSiswa();
+                            this.showMessage(""); 
+                        } else {
+                            this.showMessage(data.message || "Gagal masuk. Coba lagi.");
+                        }
+                    }
+                } catch(error) {
+                    this.showMessage("Terjadi kesalahan jaringan. Gagal menghubungi server.");
+                    console.error(error);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 }
             },
 
@@ -262,13 +292,49 @@
                 // Normalisasi
                 const cleanU = u.replace(/^@/, '').toLowerCase();
 
-                if(IS_PREVIEW) {
-                    if(mockUsers.find(x => x.username.toLowerCase() === cleanU)) {
-                        return this.showMessage("Username sudah dipakai!");
+                // Kunci tombol agar tidak hang/freeze
+                const btn = document.querySelector('button[onclick="app.register()"]');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+                try {
+                    if(IS_PREVIEW) {
+                        await new Promise(r => setTimeout(r, 500));
+                        if(mockUsers.find(x => x.username.toLowerCase() === cleanU)) {
+                            this.showMessage("Username sudah dipakai!");
+                            btn.disabled = false;
+                            btn.innerHTML = originalText;
+                            return;
+                        }
+                        mockUsers.push({ username: cleanU, password: p, nama: n, skor: 0 });
+                        this.showMessage("Berhasil mendaftar! Silakan login.", "success");
+                        setTimeout(() => this.toggleAuth('login'), 1000);
+                    } else {
+                        // KONEKSI NYATA KE GOOGLE APPS SCRIPT
+                        const formData = new URLSearchParams();
+                        formData.append('action', 'register');
+                        formData.append('payload', JSON.stringify({ nama: n, username: cleanU, password: p }));
+
+                        const response = await fetch(GAS_URL, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        
+                        if(data.success) {
+                            this.showMessage("Berhasil mendaftar! Silakan login.", "success");
+                            setTimeout(() => this.toggleAuth('login'), 1500);
+                        } else {
+                            this.showMessage(data.message || "Gagal mendaftar.");
+                        }
                     }
-                    mockUsers.push({ username: cleanU, password: p, nama: n, skor: 0 });
-                    this.showMessage("Berhasil mendaftar! Silakan login.", "success");
-                    setTimeout(() => this.toggleAuth('login'), 1000);
+                } catch(error) {
+                    this.showMessage("Terjadi kesalahan jaringan. Gagal menghubungi server.");
+                    console.error(error);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 }
             },
 
