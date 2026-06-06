@@ -61,7 +61,6 @@
             <div class="z-10 w-full max-w-md bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 p-8 md:p-10 relative transform transition-all hover:-translate-y-1 duration-500">
                 <div class="text-center mb-8">
                     <img src="https://i.imghippo.com/files/TEo9267qxU.png" alt="ANDHALGO Logo" class="w-40 h-40 mx-auto mb-4 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300">
-                  
                 </div>
 
                 <div id="auth-message" class="hidden mb-4 p-3 rounded-lg text-sm text-center font-bold"></div>
@@ -499,7 +498,7 @@
         // KONFIGURASI APLIKASI
         // UBAH IS_PREVIEW KE false JIKA AKAN DI-DEPLOY KE BLOGGER
         const IS_PREVIEW = false; 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyRDJhYDYlxOPWSRMXR36i1uaIptUSilr43MuFbzGlHHTWyiV-S7p1ouXpNqLWR0W2MmA/exec"; 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxp6w41dPS0d3mw6PN05VBJMiTIfB85YwWboJGlcusdKL0yDI8JgmyYKljTTUANQ_vE/exec"; 
         
         let mockUsers = [
             { id: 'A001', username: 'admin', password: 'edudigital', nama: 'Admin Guru', role: 'admin', skor: 0, completedLevels: [], bantuan: 3 },
@@ -512,28 +511,28 @@
             // LEVEL 1-4: SEKUENSIAL
             { title: 'Sekuensial Dasar', desc: 'Maju lurus ke tujuan.', materi: 'Logika Sekuensial: Pemahaman dasar bahwa komputer mengeksekusi instruksi satu per satu dari atas ke bawah secara berurutan tanpa melompati baris kode.', icon: 'fa-arrow-up', maxBlocks: 3, reqBlocks: [], start: {x: 0, y: 4}, target: {x: 0, y: 1}, poin: 10, walls: [], kunci: ['MAJU','MAJU','MAJU'] },
             { title: 'Navigasi Belok', desc: 'Maju dan belok menuju target.', materi: 'Orientasi Ruang: Melatih pengurutan logika kombinasi gerak maju dan rotasi arah (kanan/kiri) secara berurutan.', icon: 'fa-route', maxBlocks: 5, reqBlocks: [], start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 15, walls: [], kunci: ['MAJU','MAJU','KANAN','MAJU','MAJU'] },
-            { title: 'Jalur Bersudut', desc: 'Lewati jalur zig-zag.', materi: 'Pemecahan Masalah Sekuensial: Mengurai rute kompleks menjadi instruksi langkah demi langkah yang akurat secara sistematis.', icon: 'fa-project-diagram', maxBlocks: 8, reqBlocks: [], start: {x: 1, y: 4}, target: {x: 3, y: 1}, poin: 20, walls: [], kunci: ['MAJU','KANAN','MAJU','KIRI','MAJU','MAJU','KANAN','MAJU'] },
+            { title: 'Jalur Bersudut', desc: 'Lewati jalur zig-zag.', materi: 'Pemecahan Masalah Sekuensial: Mengurai rute kompleks menjadi instruksi langkah demi langkah yang akurat secara sistematis.', icon: 'fa-project-diagram', maxBlocks: 7, reqBlocks: [], start: {x: 1, y: 4}, target: {x: 3, y: 1}, poin: 20, walls: [], kunci: ['MAJU','KANAN','MAJU','MAJU','KIRI','MAJU','MAJU'] },
             { title: 'Rotasi Awal Robot', desc: 'Orientasi putar di awal.', materi: 'Inisialisasi Kondisi Awal: Menyadari bahwa arah hadap awal robot menentukan hasil dari instruksi "Maju" berikutnya.', icon: 'fa-compass', maxBlocks: 6, reqBlocks: [], start: {x: 2, y: 4}, target: {x: 0, y: 2}, poin: 25, walls: [], kunci: ['KIRI','MAJU','MAJU','KANAN','MAJU','MAJU'] },
             
             // LEVEL 5-10: PERULANGAN (LOOPING) - Memaksa efisiensi blok
             { title: 'Pengenalan Loop', desc: 'Gunakan Perulangan (n).', materi: 'Perulangan (Looping): Mempelajari cara membuat algoritma yang lebih efisien dengan mengulang instruksi yang sama tanpa menulisnya berkali-kali.', icon: 'fa-sync', maxBlocks: 2, reqBlocks: ['LOOP'], start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 30, walls: [], kunci: ['KANAN', 'LOOP_4_MAJU'] },
             { title: 'Looping Maju Terarah', desc: 'Gunakan blok loop menuju atas.', materi: 'Optimalisasi Kode: Kamu dipaksa untuk meminimalisir penggunaan blok. Blok sekuensial biasa tidak akan cukup untuk lulus!', icon: 'fa-redo', maxBlocks: 1, reqBlocks: ['LOOP'], start: {x: 2, y: 4}, target: {x: 2, y: 0}, poin: 35, walls: [], kunci: ['LOOP_4_MAJU'] },
             { title: 'Looping Belok', desc: 'Loop berbentuk siku.', materi: 'Kombinasi Sekuensial & Loop: Menggabungkan efisiensi perulangan dengan perubahan rotasi manual untuk membelokkan arah eksekusi.', icon: 'fa-retweet', maxBlocks: 3, reqBlocks: ['LOOP'], start: {x: 0, y: 4}, target: {x: 4, y: 0}, poin: 40, walls: [], kunci: ['LOOP_4_MAJU', 'KANAN', 'LOOP_4_MAJU'] },
-            { title: 'Loop Multi', desc: 'Dua kali menggunakan loop.', materi: 'Multi-Looping: Mengidentifikasi pola berulang yang berbeda di dalam satu masalah dan mengatasinya dengan dua blok perulangan mandiri.', icon: 'fa-layer-group', maxBlocks: 3, reqBlocks: ['LOOP'], start: {x: 1, y: 4}, target: {x: 4, y: 2}, poin: 45, walls: [], kunci: ['LOOP_2_MAJU', 'KANAN', 'LOOP_3_MAJU'] },
+            { title: 'Loop Multi', desc: 'Dua kali menggunakan loop.', materi: 'Multi-Looping: Mengidentifikasi pola berulang yang berbeda di dalam satu masalah dan mengatasinya dengan dua blok perulangan mandiri.', icon: 'fa-layer-group', maxBlocks: 3, reqBlocks: ['LOOP'], start: {x: 1, y: 4}, target: {x: 4, y: 1}, poin: 45, walls: [], kunci: ['LOOP_3_MAJU', 'KANAN', 'LOOP_3_MAJU'] },
             { title: 'Reduksi Kode Ekstrem', desc: 'Capai target dengan blok tersedikit.', materi: 'Efisiensi Memori: Melatih pola pikir programmer untuk selalu mencari solusi terpendek (algoritma paling optimal).', icon: 'fa-compress-arrows-alt', maxBlocks: 3, reqBlocks: ['LOOP'], start: {x: 4, y: 4}, target: {x: 0, y: 0}, poin: 50, walls: [], kunci: ['LOOP_4_MAJU', 'KIRI', 'LOOP_4_MAJU'] },
             { title: 'Pola Tak Beraturan', desc: 'Gunakan loop pada rute asimetris.', materi: 'Analisa Pola Lanjut: Menemukan di mana perulangan dapat diterapkan di tengah-tengah instruksi sekuensial biasa.', icon: 'fa-bezier-curve', maxBlocks: 5, reqBlocks: ['LOOP'], start: {x: 1, y: 3}, target: {x: 3, y: 1}, poin: 55, walls: [], kunci: ['MAJU','KANAN','LOOP_2_MAJU','KIRI','MAJU'] },
             
-            // LEVEL 11-20: PENGKONDISIAN (IF) - Memaksa sensor logika
-            { title: 'Gerbang Logika (IF)', desc: 'Gunakan JIKA BUNTU BELOK KANAN.', materi: 'Pengkondisian (If-Statement): Komputer dapat mengambil keputusan otomatis (belok) berdasarkan kondisi di sekitarnya (menabrak tembok).', icon: 'fa-code-branch', maxBlocks: 2, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 60, walls: [{x:0,y:2},{x:1,y:2},{x:1,y:1},{x:1,y:0}], kunci: ['LOOP_4_MAJU', 'JIKA_BUNTU_KANAN'] },
-            { title: 'Sensor Batas Peta', desc: 'Manfaatkan batas peta sebagai tembok.', materi: 'Edge Detection (Sensor Batas): Menggunakan batasan layar (buntu) sebagai pemicu (trigger) untuk mengeksekusi blok kondisi JIKA.', icon: 'fa-crop-alt', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 4, y: 4}, poin: 65, walls: [{x:0,y:0},{x:1,y:0},{x:2,y:0}], kunci: ['LOOP_5_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_4_MAJU'] },
-            { title: 'Keputusan Cerdas', desc: 'Hindari rintangan dengan IF.', materi: 'Algoritma Adaptif Cerdas: Membuat algoritma yang dapat merespon rintangan tak terduga dengan menggunakan pernyataan kondisional ganda.', icon: 'fa-brain', maxBlocks: 5, reqBlocks: ['JIKA'], start: {x: 1, y: 4}, target: {x: 3, y: 2}, poin: 70, walls: [{x:1,y:2},{x:2,y:2},{x:2,y:3}], kunci: ['LOOP_3_MAJU', 'JIKA_BUNTU_KANAN', 'MAJU', 'KIRI', 'MAJU'] },
-            { title: 'Jalur Berliku Kondisional', desc: 'Berjalan menyusuri rintangan memanjang.', materi: 'Kombinasi Ekstrem Loop & If: Memanfaatkan blok JIKA di dalam alur logika berkelanjutan untuk menelusuri dinding rintangan.', icon: 'fa-sitemap', maxBlocks: 2, reqBlocks: ['JIKA'], start: {x: 0, y: 3}, target: {x: 4, y: 1}, poin: 75, walls: [{x:0,y:1},{x:2,y:1},{x:2,y:3}], kunci: ['LOOP_4_MAJU', 'JIKA_BUNTU_KANAN'] },
-            { title: 'Sudut Sempit', desc: 'Membelok saat mendeteksi tembok pojok.', materi: 'Presisi Sensor Buntu: Melatih kapan persisnya kondisi JIKA akan aktif saat mendeteksi objek diam di depannya.', icon: 'fa-vector-square', maxBlocks: 5, reqBlocks: ['JIKA'], start: {x: 2, y: 4}, target: {x: 2, y: 1}, poin: 80, walls: [{x:2,y:2},{x:1,y:2}], kunci: ['MAJU','JIKA_BUNTU_KANAN','MAJU','KIRI','MAJU'] },
-            { title: 'Perulangan Bersyarat', desc: 'Gabungan optimalisasi dan kondisi.', materi: 'Efisiensi Lanjut Terstruktur: Mengompresi logika navigasi yang sangat rumit menjadi hanya beberapa baris kode menggunakan IF.', icon: 'fa-laptop-code', maxBlocks: 3, reqBlocks: ['JIKA', 'LOOP'], start: {x: 0, y: 4}, target: {x: 3, y: 0}, poin: 85, walls: [{x:0,y:0},{x:3,y:4}], kunci: ['LOOP_5_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_3_MAJU'] },
-            { title: 'Navigasi Mandiri', desc: 'Biarkan robot mencari jalan sendiri.', materi: 'Automasi Sistem Navigasi: Menciptakan robot yang sepenuhnya bergantung pada sensor kondisional (IF) tanpa dikendalikan manual.', icon: 'fa-robot', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 4, y: 2}, poin: 90, walls: [{x:0,y:2},{x:4,y:4}], kunci: ['LOOP_3_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_4_MAJU'] },
-            { title: 'Labirin Logika', desc: 'Keluar dari area tertutup.', materi: 'Problem Solving Kompleks: Melarikan diri dari rintangan menggunakan logika percabangan kondisional yang berkesinambungan.', icon: 'fa-dungeon', maxBlocks: 2, reqBlocks: ['JIKA'], start: {x: 1, y: 4}, target: {x: 4, y: 0}, poin: 95, walls: [{x:1,y:0},{x:2,y:0},{x:3,y:0}], kunci: ['LOOP_5_MAJU', 'JIKA_BUNTU_KANAN'] },
-            { title: 'Evaluasi Sensor', desc: 'Pemosisian arah yang krusial.', materi: 'Logika Rotasi Otomatis: Robot harus mampu mengevaluasi hambatannya dan otomatis merotasi orientasinya sebelum bergerak lagi.', icon: 'fa-microchip', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 4, y: 1}, poin: 100, walls: [{x:0,y:1},{x:4,y:4}], kunci: ['LOOP_4_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_4_MAJU'] },
-            { title: 'Tantangan Final (Boss)', desc: 'Gunakan seluruh pengetahuanmu untuk lulus.', materi: 'Ujian Akhir Algoritma Cerdas: Menerapkan Sekuensial, Looping (n), dan Pengkondisian (If) secara terpadu dengan batasan kode yang sangat ketat.', icon: 'fa-crown', maxBlocks: 5, reqBlocks: ['JIKA', 'LOOP'], start: {x: 0, y: 4}, target: {x: 3, y: 1}, poin: 150, walls: [{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:2,y:2},{x:2,y:3}], kunci: ['LOOP_3_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_3_MAJU', 'JIKA_BUNTU_KIRI', 'LOOP_2_MAJU'] }
+            // LEVEL 11-20: PENGKONDISIAN (IF) - Memaksa sensor logika dengan layout tembok penghalang mutlak
+            { title: 'Gerbang Logika (IF)', desc: 'Gunakan JIKA BUNTU BELOK KANAN.', materi: 'Pengkondisian (If-Statement): Komputer dapat mengambil keputusan otomatis (belok) berdasarkan kondisi di sekitarnya (menabrak tembok).', icon: 'fa-code-branch', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 2, y: 2}, poin: 60, walls: [{x:0,y:1}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_2_MAJU'] },
+            { title: 'Sensor Batas Peta', desc: 'Manfaatkan batas peta sebagai tembok.', materi: 'Edge Detection (Sensor Batas): Menggunakan batasan layar (buntu) sebagai pemicu (trigger) untuk mengeksekusi blok kondisi JIKA.', icon: 'fa-crop-alt', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 4, y: 0}, poin: 65, walls: [], kunci: ['LOOP_4_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_4_MAJU'] },
+            { title: 'Keputusan Cerdas', desc: 'Hindari rintangan dengan IF.', materi: 'Algoritma Adaptif Cerdas: Membuat algoritma yang dapat merespon rintangan tak terduga dengan menggunakan pernyataan kondisional ganda.', icon: 'fa-brain', maxBlocks: 5, reqBlocks: ['JIKA'], start: {x: 1, y: 4}, target: {x: 3, y: 2}, poin: 70, walls: [{x:1,y:2}], kunci: ['MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_2_MAJU', 'KIRI', 'MAJU'] },
+            { title: 'Jalur Berliku Kondisional', desc: 'Berjalan menyusuri rintangan memanjang.', materi: 'Kombinasi Ekstrem Loop & If: Memanfaatkan blok JIKA di dalam alur logika berkelanjutan untuk menelusuri dinding rintangan.', icon: 'fa-sitemap', maxBlocks: 5, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 2, y: 0}, poin: 75, walls: [{x:0,y:1}, {x:3,y:2}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_2_MAJU', 'JIKA_BUNTU_KIRI', 'LOOP_2_MAJU'] },
+            { title: 'Sudut Sempit', desc: 'Membelok saat mendeteksi tembok pojok.', materi: 'Presisi Sensor Buntu: Melatih kapan persisnya kondisi JIKA akan aktif saat mendeteksi objek diam di depannya.', icon: 'fa-vector-square', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 4, y: 4}, target: {x: 2, y: 2}, poin: 80, walls: [{x:4,y:1}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KIRI', 'LOOP_2_MAJU'] },
+            { title: 'Perulangan Bersyarat', desc: 'Gabungan optimalisasi dan kondisi.', materi: 'Efisiensi Lanjut Terstruktur: Mengompresi logika navigasi yang sangat rumit menjadi hanya beberapa baris kode menggunakan IF.', icon: 'fa-laptop-code', maxBlocks: 3, reqBlocks: ['JIKA', 'LOOP'], start: {x: 0, y: 4}, target: {x: 3, y: 2}, poin: 85, walls: [{x:0,y:1}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_3_MAJU'] },
+            { title: 'Navigasi Mandiri', desc: 'Biarkan robot mencari jalan sendiri.', materi: 'Automasi Sistem Navigasi: Menciptakan robot yang sepenuhnya bergantung pada sensor kondisional (IF) tanpa dikendalikan manual.', icon: 'fa-robot', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 4, y: 2}, poin: 90, walls: [{x:0,y:1}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_4_MAJU'] },
+            { title: 'Labirin Logika', desc: 'Keluar dari area tertutup.', materi: 'Problem Solving Kompleks: Melarikan diri dari rintangan menggunakan logika percabangan kondisional yang berkesinambungan.', icon: 'fa-dungeon', maxBlocks: 3, reqBlocks: ['JIKA'], start: {x: 1, y: 4}, target: {x: 4, y: 0}, poin: 95, walls: [], kunci: ['LOOP_4_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_3_MAJU'] },
+            { title: 'Evaluasi Sensor', desc: 'Pemosisian arah yang krusial.', materi: 'Logika Rotasi Otomatis: Robot harus mampu mengevaluasi hambatannya dan otomatis merotasi orientasinya sebelum bergerak lagi.', icon: 'fa-microchip', maxBlocks: 5, reqBlocks: ['JIKA'], start: {x: 0, y: 4}, target: {x: 4, y: 1}, poin: 100, walls: [{x:0,y:1}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_4_MAJU', 'KIRI', 'MAJU'] },
+            { title: 'Tantangan Final (Boss)', desc: 'Gunakan seluruh pengetahuanmu untuk lulus.', materi: 'Ujian Akhir Algoritma Cerdas: Menerapkan Sekuensial, Looping (n), dan Pengkondisian (If) secara terpadu dengan batasan kode yang sangat ketat.', icon: 'fa-crown', maxBlocks: 5, reqBlocks: ['JIKA', 'LOOP'], start: {x: 0, y: 4}, target: {x: 3, y: 1}, poin: 150, walls: [{x:0,y:1}, {x:4,y:2}], kunci: ['LOOP_2_MAJU', 'JIKA_BUNTU_KANAN', 'LOOP_3_MAJU', 'JIKA_BUNTU_KIRI', 'MAJU'] }
         ];
 
         const state = {
@@ -955,7 +954,7 @@
                 document.getElementById('modal-materi').textContent = state.currentLevelData.materi || 'Materi dasar algoritma.';
                 document.getElementById('modal-icon-header').className = `fas ${state.currentLevelData.icon}`;
 
-                // Susun Persyaratan
+                // Susun Persyaratan Lulus agar Jelas bagi Siswa
                 let reqText = [];
                 if(state.currentLevelData.maxBlocks) reqText.push(`Maks ${state.currentLevelData.maxBlocks} Blok`);
                 if(state.currentLevelData.reqBlocks) {
@@ -999,7 +998,7 @@
                 state.currentUser.bantuan -= 1;
                 document.getElementById('sisa-bantuan').textContent = state.currentUser.bantuan;
                 
-                // Render Kunci ke Modal
+                // Render Kunci ke Modal dengan Deskripsi yang Benar
                 const list = document.getElementById('bantuan-kunci');
                 list.innerHTML = '';
                 const kunci = state.currentLevelData.kunci || ['Belum ada data bantuan untuk level ini.'];
@@ -1129,8 +1128,8 @@
                 
                 const lvlData = state.currentLevelData;
 
-                // --- VALIDASI KENDALA (CONSTRAINTS / ANTI-CHEAT) ---
-                // 1. Cek maksimal batas blok
+                // --- VALIDASI KENDALA MUTLAK (CONSTRAINTS / ANTI-CHEAT) ---
+                // 1. Cek maksimal batas blok agar siswa tidak melakukan gerakan sekuensial manual pada level bersyarat
                 if(lvlData.maxBlocks && state.instructions.length > lvlData.maxBlocks) {
                      document.getElementById('sim-status').innerHTML = `<span class="text-red-600 font-bold"><i class="fas fa-times-circle"></i> GAGAL: Rangkaianmu terlalu panjang (${state.instructions.length} blok). Level ini mensyaratkan maksimal ${lvlData.maxBlocks} blok. Hapus blok dan gunakan logika yang lebih efisien!</span>`;
                      return;
@@ -1161,8 +1160,10 @@
                 this.updateRobotVisual();
 
                 const walls = state.currentLevelData?.walls || [];
+                let executionFailed = false;
 
                 for(let i = 0; i < state.instructions.length; i++) {
+                    if(executionFailed) break;
                     let rawCmd = state.instructions[i];
                     const blockEl = document.getElementById(`instr-${i}`);
                     if(blockEl) { blockEl.classList.add('executing-block'); blockEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
@@ -1171,6 +1172,7 @@
                     if(rawCmd.startsWith('LOOP_')) { let parts = rawCmd.split('_'); executionCount = parseInt(parts[1]); baseAction = parts[2]; }
 
                     for(let j = 0; j < executionCount; j++) {
+                        if(executionFailed) break;
                         let actionMsg = baseAction;
 
                         // Perhitungan Koordinat Berikutnya Jika Maju
@@ -1198,14 +1200,23 @@
                             if(baseAction === 'KIRI') state.robotDir = (state.robotDir - 1 + 4) % 4;
                             else if(baseAction === 'KANAN') state.robotDir = (state.robotDir + 1) % 4;
                             else if(baseAction === 'MAJU') {
-                                if(!isBuntu) state.robotPos = { x: nextX, y: nextY };
-                                else actionMsg = 'Gagal! Menabrak tembok/batas.';
+                                if(!isBuntu) {
+                                    state.robotPos = { x: nextX, y: nextY };
+                                } else {
+                                    actionMsg = 'Menabrak tembok/batas!';
+                                    executionFailed = true;
+                                }
                             } else if(baseAction === 'MUNDUR') {
                                 // Hitung mundur
                                 let backX = state.robotPos.x; let backY = state.robotPos.y;
                                 if(state.robotDir === 0) backY++; else if(state.robotDir === 1) backX--; else if(state.robotDir === 2) backY--; else if(state.robotDir === 3) backX++;
                                 let backIsBuntu = walls.some(w => w.x === backX && w.y === backY) || (backX<0 || backX>4 || backY<0 || backY>4);
-                                if(!backIsBuntu) state.robotPos = { x: backX, y: backY };
+                                if(!backIsBuntu) {
+                                    state.robotPos = { x: backX, y: backY };
+                                } else {
+                                    actionMsg = 'Mundur menabrak rintangan!';
+                                    executionFailed = true;
+                                }
                             }
                         }
                         
@@ -1218,8 +1229,8 @@
                 
                 allButtons.forEach(btn => btn.style.pointerEvents = 'auto');
 
-                // Verifikasi Menang
-                if(state.currentLevelData && state.robotPos.x === state.currentLevelData.target.x && state.robotPos.y === state.currentLevelData.target.y) {
+                // Verifikasi Menang (Syarat: Tidak Gagal tabrakan & Posisi Akhir ada di Bendera Target)
+                if(!executionFailed && state.currentLevelData && state.robotPos.x === state.currentLevelData.target.x && state.robotPos.y === state.currentLevelData.target.y) {
                     document.getElementById('sim-status').innerHTML = '<span class="text-emerald-600 font-extrabold">Misi Berhasil!</span>';
                     
                     const earnedXP = state.currentLevelData.poin || 10;
